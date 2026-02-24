@@ -11,114 +11,8 @@
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
 
-    <style>
-        body {
-            min-height: 100vh;
-            overflow-x: hidden;
-            transition: background 0.3s, color 0.3s;
-        }
-
-        .wrapper {
-            display: flex;
-            min-height: 100vh;
-        }
-
-        /* ===== SIDEBAR ===== */
-        .sidebar {
-            width: 250px;
-            transition: width 0.3s ease, background 0.3s ease, left 0.3s ease;
-            color: #fff;
-        }
-        .sidebar.collapsed {
-            width: 60px;
-        }
-        .sidebar .nav-link {
-            color: rgba(255,255,255,.75);
-            padding: 12px 20px;
-            transition: background 0.2s, color 0.2s;
-        }
-        .sidebar .nav-link:hover,
-        .sidebar .nav-link.active {
-            background: rgba(255,255,255,.15);
-            color: #fff;
-        }
-        .sidebar .nav-text {
-            transition: opacity 0.2s ease;
-        }
-        .sidebar.collapsed .nav-text {
-            opacity: 0;
-            pointer-events: none;
-        }
-
-        /* ===== CONTENT ===== */
-        .content {
-            flex: 1;
-            padding: 20px;
-            background: #f4f6f9;
-            transition: background 0.3s, color 0.3s;
-        }
-
-        /* ===== THEMES ===== */
-        /* Purple */
-        body.theme-purple .navbar { background: #5b2d8b !important; }
-        body.theme-purple .sidebar { background: #0d0219 !important; }
-        body.theme-purple .sidebar .nav-link:hover,
-        body.theme-purple .sidebar .nav-link.active { background: rgba(255,255,255,.15) !important; color: #fff !important; }
-
-        /* Orange */
-        body.theme-orange .navbar { background: #ff9800 !important; color: #000 !important; }
-        body.theme-orange .sidebar { background: #ffffff !important; color: #000 !important; }
-        body.theme-orange .sidebar .nav-link { color: #212529 !important; }
-        body.theme-orange .sidebar .nav-link:hover,
-        body.theme-orange .sidebar .nav-link.active { background: rgba(0,0,0,.1) !important; color: #000 !important; }
-
-        /* Red */
-        body.theme-red .navbar { background: #b71c1c !important; }
-        body.theme-red .sidebar { background: #0d0219 !important; }
-        body.theme-red .sidebar .nav-link:hover,
-        body.theme-red .sidebar .nav-link.active { background: rgba(255,255,255,.15) !important; color: #fff !important; }
-
-        /* Black */
-        body.theme-black { background: #ffffff !important; color: #000 !important; }
-        body.theme-black .navbar { background: #212121 !important; color: #fff !important; }
-        body.theme-black .sidebar { background: #ffffff !important; color: #000 !important; }
-        body.theme-black .sidebar .nav-link { color: #212529 !important; }
-        body.theme-black .sidebar .nav-link:hover,
-        body.theme-black .sidebar .nav-link.active { background: rgba(0,0,0,.1) !important; color: #000 !important; }
-
-        /* ===== BUTTON COLORS ===== */
-        .btn-purple { background-color: #5b2d8b; color: #fff; }
-        .btn-purple:hover { background-color: #5b2d8b; color: #fff; }
-        .btn-orange { background-color: #ff9800; color: #fff; }
-        .btn-orange:hover { background-color: #ff9800; color: #fff;   }
-        .btn-red { background-color: #b71c1c; color: #fff; }
-        .btn-red:hover { background-color: #b71c1c; color: #fff;   }
-
-        /* ===== OFFCANVAS MOBILE ===== */
-        @media (max-width: 992px) {
-            .sidebar {
-                position: fixed;
-                top: 0;
-                left: -250px;
-                height: 100%;
-                z-index: 1030;
-            }
-            .sidebar.show {
-                left: 0;
-            }
-        }
-
-        .btn-group .btn {
-            width: 28px;
-            height: 28px;
-            padding: 0;
-            border-radius: 50%;
-        }
-
-        .btn-group .btn:hover {
-            transform: scale(1.1);
-        }
-    </style>
+    <!-- Admin CSS -->
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 </head>
 
 <body class="theme-purple">
@@ -150,16 +44,67 @@
     <!-- SIDEBAR -->
     <aside id="sidebar" class="sidebar">
         <ul class="nav flex-column mt-3">
+            <!-- Dashboard -->
             <li class="nav-item">
                 <a href="#" class="nav-link active">
-                    <i class="fas fa-home me-2"></i>
+                    <i class="fas fa-tachometer-alt me-2"></i>
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
+
+            <!-- Settings (Pengaturan) -->
             <li class="nav-item">
                 <a href="#" class="nav-link">
-                    <i class="fas fa-cogs me-2"></i>
+                    <i class="fas fa-cog me-2"></i>
                     <span class="nav-text">Settings</span>
+                </a>
+            </li>
+
+            <!-- Galeri (Gallery) -->
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-images me-2"></i>
+                    <span class="nav-text">Galeri</span>
+                </a>
+            </li>
+
+            <!-- Fasilitas (Facilities) -->
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-building me-2"></i>
+                    <span class="nav-text">Fasilitas</span>
+                </a>
+            </li>
+
+            <!-- Harga Menu (Menu Prices) -->
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-utensils me-2"></i>
+                    <span class="nav-text">Harga Menu</span>
+                </a>
+            </li>
+
+            <!-- Pengumuman (Announcements) -->
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-bullhorn me-2"></i>
+                    <span class="nav-text">Pengumuman</span>
+                </a>
+            </li>
+
+            <!-- Profil (Profile) -->
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-id-card me-2"></i>
+                    <span class="nav-text">Profil</span>
+                </a>
+            </li>
+
+            <!-- Ulasan (Reviews) -->
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-star me-2"></i>
+                    <span class="nav-text">Ulasan</span>
                 </a>
             </li>
         </ul>
