@@ -4,15 +4,25 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Facility;
+use App\Services\FileUploadService;
 
 class FacilityController extends Controller
 {
+    protected $fileService;
+
+    public function __construct(FileUploadService $fileService)
+    {
+        $this->fileService = $fileService;
+    }
+
     /**
      * Tampilkan daftar fasilitas.
      */
     public function index()
     {
-        return view('admin.facilities.index');
+        $facilities = Facility::orderBy('created_at', 'desc')->paginate(15);
+        return view('admin.facilities.index', compact('facilities'));
     }
 
     /**
@@ -28,38 +38,73 @@ class FacilityController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->validate([
+            'name'          => 'required|string|max:255',
+            'description'   => 'nullable|string',
+            'photo'          => 'nullable|image|max:10240',
+        ]);
+
+        if ($request->hasFile('photo')) {
+            // store file
+            $data['photo_path'] = $this->fileService->upload($request->file('photo'), 'facilities');
+        }
+
+        Facility::create($data);
+
+        return redirect()->route('admin.facilities.index')
+                         ->with('success', 'Facility created.');
     }
 
     /**
      * Tampilkan fasilitas tertentu.
      */
-    public function show(string $id)
+    public function show(Facility $facility)
     {
-        //
+        return view('admin.facilities.show', compact('facility'));
     }
 
     /**
      * Tampilkan form edit fasilitas.
      */
-    public function edit(string $id)
+    public function edit(Facility $facility)
     {
-        return view('admin.facilities.edit', compact('id'));
+            return view('admin.facilities.edit', compact('facility'));
     }
 
     /**
      * Update fasilitas.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Facility $facility)
     {
-        //
+        $data = $request->validate([
+            'name'          => 'required|string|max:255',
+            'description'   => 'nullable|string',
+            'photo'          => 'nullable|image|max:10240',
+        ]);
+
+        if ($request->hasFile('photo')) {
+            // store file
+            $data['photo_path'] = $this->fileService->replace($facility->photo_path, $request->file('photo'), 'facilities');
+        }
+
+        $facility->update($data);
+
+        return redirect()->route('admin.facilities.index')
+                         ->with('success', 'Facility updated.');
     }
 
     /**
      * Hapus fasilitas.
      */
-    public function destroy(string $id)
+    public function destroy(Facility $facility)
     {
-        //
+        if ($facility->photo_path) {
+            $this->fileService->delete($facility->photo_path);
+        }
+
+        $facility->delete();
+
+        return redirect()->route('admin.facilities.index')
+                        ->with('success', 'Facility deleted.');
     }
 }
