@@ -46,63 +46,63 @@
         <ul class="nav flex-column mt-3">
             <!-- Dashboard -->
             <li class="nav-item">
-                <a href="#" class="nav-link active">
+                <a href="{{ route('admin.dashboard') }}" class="nav-link active">
                     <i class="fas fa-tachometer-alt me-2"></i>
                     <span class="nav-text">Dashboard</span>
                 </a>
             </li>
 
-            <!-- Settings (Pengaturan) -->
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-cog me-2"></i>
-                    <span class="nav-text">Settings</span>
-                </a>
-            </li>
-
-            <!-- Galeri (Gallery) -->
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-images me-2"></i>
-                    <span class="nav-text">Galeri</span>
-                </a>
-            </li>
-
-            <!-- Fasilitas (Facilities) -->
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-building me-2"></i>
-                    <span class="nav-text">Fasilitas</span>
-                </a>
-            </li>
-
-            <!-- Harga Menu (Menu Prices) -->
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-utensils me-2"></i>
-                    <span class="nav-text">Harga Menu</span>
-                </a>
-            </li>
-
             <!-- Pengumuman (Announcements) -->
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{{ route('admin.announcements.index') }}" class="nav-link">
                     <i class="fas fa-bullhorn me-2"></i>
                     <span class="nav-text">Pengumuman</span>
                 </a>
             </li>
 
+            <!-- Fasilitas (Facilities) -->
+            <li class="nav-item">
+                <a href="{{ route('admin.facilities.index') }}" class="nav-link">
+                    <i class="fas fa-building me-2"></i>
+                    <span class="nav-text">Fasilitas</span>
+                </a>
+            </li>
+
+            <!-- Harga (Prices) -->
+            <li class="nav-item">
+                <a href="{{ route('admin.prices.index') }}" class="nav-link">
+                    <i class="fas fa-utensils me-2"></i>
+                    <span class="nav-text">Harga</span>
+                </a>
+            </li>
+
+            <!-- Galeri (Gallery) -->
+            <li class="nav-item">
+                <a href="{{ route('admin.galleries.index') }}" class="nav-link">
+                    <i class="fas fa-images me-2"></i>
+                    <span class="nav-text">Galeri</span>
+                </a>
+            </li>
+
             <!-- Profil (Profile) -->
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{{ route('admin.profiles.index') }}" class="nav-link">
                     <i class="fas fa-id-card me-2"></i>
                     <span class="nav-text">Profil</span>
                 </a>
             </li>
 
+            <!-- Contact -->
+            <li class="nav-item">
+                <a href="{{ route('admin.contacts.index') }}" class="nav-link">
+                    <i class="fas fa-address-card me-2"></i>
+                    <span class="nav-text">Contact</span>
+                </a>
+            </li>
+
             <!-- Ulasan (Reviews) -->
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{{ route('admin.reviews.index') }}" class="nav-link">
                     <i class="fas fa-star me-2"></i>
                     <span class="nav-text">Ulasan</span>
                 </a>
@@ -112,6 +112,16 @@
 
     <!-- CONTENT -->
     <main class="content">
+        @if(session('success'))
+            <div class="container mt-3">
+                <div class="alert alert-success">{{ session('success') }}</div>
+            </div>
+        @endif
+        @if(session('error'))
+            <div class="container mt-3">
+                <div class="alert alert-danger">{{ session('error') }}</div>
+            </div>
+        @endif
         @yield('content')
     </main>
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use App\Models\Contact;
 
 class ContactController extends Controller
 {
@@ -12,54 +13,34 @@ class ContactController extends Controller
      */
     public function index()
     {
-        return view('admin.contacts.index');
-    }
-
-    /**
-     * Tampilkan form buat kontak baru.
-     */
-    public function create()
-    {
-        return view('admin.contacts.create');
-    }
-
-    /**
-     * Simpan kontak baru.
-     */
-    public function store(Request $request)
-    {
-        //
-    }
-
-    /**
-     * Tampilkan kontak tertentu.
-     */
-    public function show(string $id)
-    {
-        //
-    }
-
-    /**
-     * Tampilkan form edit kontak.
-     */
-    public function edit(string $id)
-    {
-        return view('admin.contacts.edit', compact('id'));
+        $contact = Contact::firstOrCreate([]);
+        return view('admin.contacts.index', compact('contact'));
     }
 
     /**
      * Update kontak.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request)
     {
-        //
-    }
+        $contact = Contact::firstOrCreate([]);
 
-    /**
-     * Hapus kontak.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $data = $request->validate([
+            'address' => 'nullable|string|max:255',
+            'email' => 'nullable|email|max:255',
+            'phone' => 'nullable|string|max:50',
+            'google_maps_embed' => 'nullable|string',
+            'instagram' => 'nullable|string|max:255',
+            'facebook' => 'nullable|string|max:255',
+            'twitter' => 'nullable|string|max:255',
+            'is_active' => 'nullable|boolean'
+        ]);
+
+        $data['is_active'] = $request->has('is_active');
+
+        $contact->update($data);
+
+        return redirect()
+            ->route('admin.contacts.index')
+            ->with('success', 'Contact updated successfully');
     }
 }
