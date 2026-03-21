@@ -1,68 +1,60 @@
 <?php
-
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\Admin\ProfileController;
-use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\ReviewController;
 
-// Public home (could redirect or show landing page)
+// Public home
 Route::get('/', function () {
     return view('auth.login');
 });
 
 // Authentication routes
 Route::get('login', [AuthController::class, 'showLoginForm'])
-     ->name('login');
-
+    ->name('login');
 Route::post('login', [AuthController::class, 'login'])
-     ->name('login.post');
-
+    ->name('login.post');
 Route::post('logout', [AuthController::class, 'logout'])
-     ->name('logout');
+    ->name('logout');
 
 // Admin section routes
 Route::middleware(['auth', EnsureAdmin::class])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
+
         Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
             ->name('dashboard');
 
-        // statistics
-
+        // Reviews
         Route::resource('reviews', ReviewController::class);
-
-        Route::post('reviews/{review}/toggle-approval',[ReviewController::class,'toggleApproval'])
+        Route::post('reviews/{review}/toggle-approval', [ReviewController::class, 'toggleApproval'])
             ->name('reviews.toggleApproval');
-
-        Route::post('reviews/{id}/restore', [ReviewController::class,'restore'])
+        Route::post('reviews/{id}/restore', [ReviewController::class, 'restore'])
             ->name('reviews.restore');
-
-        Route::get('reviews-stats', [ReviewController::class,'stats'])
+        Route::get('reviews-stats', [ReviewController::class, 'stats'])
             ->name('reviews.stats');
 
-        // Profile (singleton)
-        Route::get('profiles', [ProfileController::class, 'index'])
-            ->name('profiles.index');
-        Route::put('profiles', [ProfileController::class, 'update'])
-            ->name('profiles.update');
-
-        // Contact (singleton)
-        Route::get('contacts', [ContactController::class, 'index'])
-            ->name('contacts.index');
-        Route::put('contacts', [ContactController::class, 'update'])
-            ->name('contacts.update');
-
+        // Prices
         Route::get('prices/foods/gallery', [App\Http\Controllers\Admin\PriceController::class, 'foodGallery'])
             ->name('prices.food.gallery');
+        Route::resource('prices', App\Http\Controllers\Admin\PriceController::class);
 
-        // resource controllers for CRUD management
+        // Resource controllers
         Route::resource('galleries', App\Http\Controllers\Admin\GalleryController::class);
         Route::resource('facilities', App\Http\Controllers\Admin\FacilityController::class);
-        Route::resource('prices', App\Http\Controllers\Admin\PriceController::class);
+        Route::resource('profiles', App\Http\Controllers\Admin\ProfileController::class);
+        Route::resource('contacts', App\Http\Controllers\Admin\ContactController::class);
+        Route::resource('faqs', App\Http\Controllers\Admin\FaqController::class);
+        Route::resource('schedules', App\Http\Controllers\Admin\ScheduleController::class);
+
+        // Announcements
         Route::resource('announcements', App\Http\Controllers\Admin\AnnouncementController::class);
         Route::patch('announcements/{announcement}/toggle', [App\Http\Controllers\Admin\AnnouncementController::class, 'toggle'])
             ->name('announcements.toggle');
-});
+
+        // Banners
+        Route::resource('banners', App\Http\Controllers\Admin\BannerController::class);
+        Route::patch('banners/{banner}/toggle', [App\Http\Controllers\Admin\BannerController::class, 'toggle'])
+            ->name('banners.toggle');
+    });

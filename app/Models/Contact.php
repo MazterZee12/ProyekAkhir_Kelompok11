@@ -13,6 +13,7 @@ class Contact extends Model
         'google_maps_embed',
         'instagram',
         'facebook',
+        'youtube',
         'twitter',
         'is_active',
         'views'

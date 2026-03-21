@@ -3,9 +3,9 @@
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4>Contacts</h4>
-        <a href="{{ route('admin.contacts.create') }}" class="btn btn-primary">
-            + Add Contact
+        <h4>Schedules</h4>
+        <a href="{{ route('admin.schedules.create') }}" class="btn btn-primary">
+            + Add Schedule
         </a>
     </div>
     <div class="card">
@@ -14,36 +14,34 @@
                 <thead>
                     <tr>
                         <th width="60">#</th>
-                        <th>Address</th>
-                        <th>Email</th>
-                        <th>Phone</th>
+                        <th>Day</th>
+                        <th>Open Time</th>
+                        <th>Close Time</th>
+                        <th>Capacity</th>
                         <th width="80">Status</th>
                         <th width="220">Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                @forelse($contacts as $contact)
+                @forelse($schedules as $schedule)
                     <tr>
-                        <td>{{ $contacts->firstItem() + $loop->index }}</td>
-                        <td>{{ $contact->address ?? '-' }}</td>
-                        <td>{{ $contact->email ?? '-' }}</td>
-                        <td>{{ $contact->phone ?? '-' }}</td>
+                        <td>{{ $schedules->firstItem() + $loop->index }}</td>
+                        <td><strong>{{ $schedule->day }}</strong></td>
+                        <td>{{ $schedule->open_time }}</td>
+                        <td>{{ $schedule->close_time }}</td>
+                        <td>{{ $schedule->capacity ?? '-' }}</td>
                         <td>
-                            @if($contact->is_active)
+                            @if($schedule->is_active)
                                 <span class="badge bg-success">Active</span>
                             @else
                                 <span class="badge bg-secondary">Inactive</span>
                             @endif
                         </td>
                         <td class="d-flex gap-1">
-                            <a href="{{ route('admin.contacts.show', $contact->id) }}" class="btn btn-sm btn-info">
-                                View
-                            </a>
-                            <a href="{{ route('admin.contacts.edit', $contact->id) }}" class="btn btn-sm btn-warning">
-                                Edit
-                            </a>
-                            <form action="{{ route('admin.contacts.destroy', $contact->id) }}" method="POST"
-                                onsubmit="return confirm('Delete this contact?')">
+                            <a href="{{ route('admin.schedules.show', $schedule->id) }}" class="btn btn-sm btn-info">View</a>
+                            <a href="{{ route('admin.schedules.edit', $schedule->id) }}" class="btn btn-sm btn-warning">Edit</a>
+                            <form action="{{ route('admin.schedules.destroy', $schedule->id) }}" method="POST"
+                                onsubmit="return confirm('Delete this schedule?')">
                                 @csrf
                                 @method('DELETE')
                                 <button class="btn btn-sm btn-danger">Delete</button>
@@ -52,12 +50,12 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="6" class="text-center">No contacts found</td>
+                        <td colspan="7" class="text-center">No schedules found</td>
                     </tr>
                 @endforelse
                 </tbody>
             </table>
-            <div class="mt-3">{{ $contacts->links() }}</div>
+            <div class="mt-3">{{ $schedules->links() }}</div>
         </div>
     </div>
 </div>

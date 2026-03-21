@@ -1,109 +1,70 @@
 @extends('layouts.admin')
 
 @section('content')
-
 <div class="container">
-
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <h4>Profile Information</h4>
-</div>
-
-@if(session('success'))
-    <div class="alert alert-success">
-        {{ session('success') }}
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4>Profiles</h4>
+        <a href="{{ route('admin.profiles.create') }}" class="btn btn-primary">
+            + Add Profile
+        </a>
     </div>
-@endif
-
-<div class="card">
-    <div class="card-body">
-
-        <form action="{{ route('admin.profiles.update') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            @method('PUT')
-
-            <!-- History -->
-            <div class="mb-3">
-                <label class="form-label">History</label>
-                <textarea name="history" class="form-control" rows="4">{{ old('history',$profile->history) }}</textarea>
-            </div>
-
-            <!-- Vision -->
-            <div class="mb-3">
-                <label class="form-label">Vision</label>
-                <textarea name="vision" class="form-control" rows="3">{{ old('vision',$profile->vision) }}</textarea>
-            </div>
-
-            <!-- Mission -->
-            <div class="mb-3">
-                <label class="form-label">Mission</label>
-                <textarea name="mission" class="form-control" rows="3">{{ old('mission',$profile->mission) }}</textarea>
-            </div>
-
-            <!-- Manager Name -->
-            <div class="mb-3">
-                <label class="form-label">Manager Name</label>
-                <input type="text"
-                       name="manager_name"
-                       class="form-control"
-                       value="{{ old('manager_name',$profile->manager_name) }}">
-            </div>
-
-            <!-- Manager Email -->
-            <div class="mb-3">
-                <label class="form-label">Manager Email</label>
-                <input type="email"
-                       name="manager_email"
-                       class="form-control"
-                       value="{{ old('manager_email',$profile->manager_email) }}">
-            </div>
-
-            <!-- Manager Phone -->
-            <div class="mb-3">
-                <label class="form-label">Manager Phone</label>
-                <input type="text"
-                       name="manager_phone"
-                       class="form-control"
-                       value="{{ old('manager_phone',$profile->manager_phone) }}">
-            </div>
-
-            <!-- Logo -->
-            <div class="mb-3">
-                <label class="form-label">Logo</label>
-
-                @if($profile->logo_path)
-                    <div class="mb-2">
-                        <img src="{{ asset('storage/'.$profile->logo_path) }}"
-                             width="120"
-                             class="img-thumbnail">
-                    </div>
-                @endif
-
-                <input type="file" name="logo" class="form-control">
-            </div>
-
-            <!-- Active -->
-            <div class="form-check mb-3">
-                <input class="form-check-input"
-                       type="checkbox"
-                       name="is_active"
-                       value="1"
-                       {{ old('is_active',$profile->is_active ?? true) ? 'checked' : '' }}>
-
-                <label class="form-check-label">
-                    Active Profile
-                </label>
-            </div>
-
-            <button type="submit" class="btn btn-primary">
-                Save Profile
-            </button>
-
-        </form>
-
+    <div class="card">
+        <div class="card-body">
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th width="60">#</th>
+                        <th width="120">Logo</th>
+                        <th>Name</th>
+                        <th>Established</th>
+                        <th width="80">Status</th>
+                        <th width="220">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @forelse($profiles as $profile)
+                    <tr>
+                        <td>{{ $profiles->firstItem() + $loop->index }}</td>
+                        <td>
+                            @if($profile->logo_path)
+                                <img src="{{ asset('storage/'.$profile->logo_path) }}" width="80" class="img-thumbnail">
+                            @else
+                                -
+                            @endif
+                        </td>
+                        <td><strong>{{ $profile->name }}</strong></td>
+                        <td>{{ $profile->established_year ?? '-' }}</td>
+                        <td>
+                            @if($profile->is_active)
+                                <span class="badge bg-success">Active</span>
+                            @else
+                                <span class="badge bg-secondary">Inactive</span>
+                            @endif
+                        </td>
+                        <td class="d-flex gap-1">
+                            <a href="{{ route('admin.profiles.show', $profile->id) }}" class="btn btn-sm btn-info">
+                                View
+                            </a>
+                            <a href="{{ route('admin.profiles.edit', $profile->id) }}" class="btn btn-sm btn-warning">
+                                Edit
+                            </a>
+                            <form action="{{ route('admin.profiles.destroy', $profile->id) }}" method="POST"
+                                onsubmit="return confirm('Delete this profile?')">
+                                @csrf
+                                @method('DELETE')
+                                <button class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                @empty
+                    <tr>
+                        <td colspan="6" class="text-center">No profiles found</td>
+                    </tr>
+                @endforelse
+                </tbody>
+            </table>
+            <div class="mt-3">{{ $profiles->links() }}</div>
+        </div>
     </div>
 </div>
-```
-
-</div>
-
 @endsection
