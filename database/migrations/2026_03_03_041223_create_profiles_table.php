@@ -13,19 +13,15 @@ return new class extends Migration
     {
         Schema::create('profiles', function (Blueprint $table) {
             $table->id();
-
+            $table->string('name');
+            $table->text('description')->nullable();
             $table->text('history')->nullable();
             $table->text('vision')->nullable();
             $table->text('mission')->nullable();
-
-            $table->string('manager_name')->nullable();
-            $table->string('manager_email')->nullable();
-            $table->string('manager_phone',50)->nullable();
-
+            $table->year('established_year')->nullable();
+            $table->text('regulations')->nullable();
             $table->string('logo_path')->nullable();
-
             $table->boolean('is_active')->default(true);
-
             $table->timestamps();
         });
     }

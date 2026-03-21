@@ -10,16 +10,22 @@ class EnsureAdmin
 {
     /**
      * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
     public function handle(Request $request, Closure $next): Response
     {
         $user = $request->user();
+
         if (!$user || $user->role !== 'admin') {
-            // could redirect to home or abort with 403
-            abort(403, 'Unauthorized.');
+            // jika ajax return json
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthorized.'], 403);
+            }
+            // redirect ke login dengan pesan error
+            return redirect()
+                ->route('login')
+                ->with('error', 'Anda tidak memiliki akses ke halaman ini.');
         }
+
         return $next($request);
     }
 }

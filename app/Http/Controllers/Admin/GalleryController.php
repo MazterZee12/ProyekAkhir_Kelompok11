@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Gallery;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
 
 class GalleryController extends Controller
 {
@@ -15,7 +16,6 @@ class GalleryController extends Controller
     public function index()
     {
         $galleries = Gallery::orderBy('created_at','desc')->paginate(15);
-
         return view('admin.galleries.index', compact('galleries'));
     }
 
@@ -38,22 +38,26 @@ class GalleryController extends Controller
             'file' => 'required|file|mimes:jpg,jpeg,png,gif,mp4|max:10240',
         ]);
 
-        $file = $request->file('file');
+        try {
+            $file = $request->file('file');
+            $mime = $file->getMimeType();
+            $type = str_starts_with($mime, 'image') ? 'photo' : 'video';
+            $filename = uniqid().'.'.$file->getClientOriginalExtension();
+            $file->storeAs('galleries', $filename, 'public');
+            $data['file_path'] = 'galleries/'.$filename;
+            $data['type'] = $type;
 
-        $mime = $file->getMimeType();
-        $type = str_starts_with($mime, 'image') ? 'photo' : 'video';
+            Gallery::create($data);
 
-        $filename = uniqid().'.'.$file->getClientOriginalExtension();
+            return redirect()->route('admin.galleries.index')
+                ->with('success','Gallery item created.');
 
-        $file->storeAs('galleries', $filename, 'public');
-
-        $data['file_path'] = 'galleries/'.$filename;
-        $data['type'] = $type;
-
-        Gallery::create($data);
-
-        return redirect()->route('admin.galleries.index')
-            ->with('success','Gallery item created.');
+        } catch (\Exception $e) {
+            Log::error('GalleryController::store failed', [
+                'error' => $e->getMessage()
+            ]);
+            return back()->withInput()->with('error', 'Gagal menyimpan item gallery.');
+        }
     }
 
     /**
@@ -83,30 +87,35 @@ class GalleryController extends Controller
             'file' => 'nullable|file|mimes:jpg,jpeg,png,gif,mp4|max:10240',
         ]);
 
-        if($request->hasFile('file'))
-        {
-            if($gallery->file_path)
+        try {
+            if($request->hasFile('file'))
             {
-                Storage::disk('public')->delete($gallery->file_path);
+                if($gallery->file_path)
+                {
+                    Storage::disk('public')->delete($gallery->file_path);
+                }
+
+                $file = $request->file('file');
+                $mime = $file->getMimeType();
+                $type = str_starts_with($mime, 'image') ? 'photo' : 'video';
+                $filename = uniqid().'.'.$file->getClientOriginalExtension();
+                $file->storeAs('galleries', $filename, 'public');
+                $data['file_path'] = 'galleries/'.$filename;
+                $data['type'] = $type;
             }
 
-            $file = $request->file('file');
+            $gallery->update($data);
 
-            $mime = $file->getMimeType();
-            $type = str_starts_with($mime, 'image') ? 'photo' : 'video';
+            return redirect()->route('admin.galleries.index')
+                ->with('success','Gallery item updated.');
 
-            $filename = uniqid().'.'.$file->getClientOriginalExtension();
-
-            $file->storeAs('galleries', $filename, 'public');
-
-            $data['file_path'] = 'galleries/'.$filename;
-            $data['type'] = $type;
+        } catch (\Exception $e) {
+            Log::error('GalleryController::update failed', [
+                'id'    => $gallery->id,
+                'error' => $e->getMessage()
+            ]);
+            return back()->withInput()->with('error', 'Gagal memperbarui item gallery.');
         }
-
-        $gallery->update($data);
-
-        return redirect()->route('admin.galleries.index')
-            ->with('success','Gallery item updated.');
     }
 
     /**
@@ -114,14 +123,24 @@ class GalleryController extends Controller
      */
     public function destroy(Gallery $gallery)
     {
-        if($gallery->file_path)
-        {
-            Storage::disk('public')->delete($gallery->file_path);
+        try {
+            if($gallery->file_path)
+            {
+                Storage::disk('public')->delete($gallery->file_path);
+            }
+
+            $gallery->delete();
+
+            return redirect()->route('admin.galleries.index')
+                ->with('success','Gallery item removed.');
+
+        } catch (\Exception $e) {
+            Log::error('GalleryController::destroy failed', [
+                'id'    => $gallery->id,
+                'error' => $e->getMessage()
+            ]);
+            return redirect()->route('admin.galleries.index')
+                ->with('error', 'Gagal menghapus item gallery.');
         }
-
-        $gallery->delete();
-
-        return redirect()->route('admin.galleries.index')
-            ->with('success','Gallery item removed.');
     }
 }

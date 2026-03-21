@@ -7,18 +7,21 @@ use Illuminate\Database\Eloquent\Model;
 class Profile extends Model
 {
     protected $fillable = [
+        'name',
+        'description',
         'history',
         'vision',
         'mission',
-        'manager_name',
-        'manager_email',
-        'manager_phone',
+        'established_year',
+        'opening_hours',
+        'regulations',
         'logo_path',
         'is_active'
     ];
 
     protected $casts = [
-        'is_active' => 'boolean',
+        'is_active'         => 'boolean',
+        'established_year'  => 'integer',
     ];
 
     public function scopeActive($query)
