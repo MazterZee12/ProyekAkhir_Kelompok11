@@ -4,10 +4,9 @@ use App\Http\Middleware\EnsureAdmin;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Admin\ReviewController;
 
-// Public home
-Route::get('/', function () {
-    return view('auth.login');
-});
+// Public routes
+Route::get('/', [\App\Http\Controllers\Public\HomeController::class, 'index'])
+    ->name('home');
 
 // Authentication routes
 Route::get('login', [AuthController::class, 'showLoginForm'])

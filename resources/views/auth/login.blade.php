@@ -1,53 +1,126 @@
 @extends('layouts.auth')
 
-@section('title','Login')
+@section('title', 'Login — Pantai Pasir Putih Toba')
 
 @section('content')
-<div class="container" style="max-width:420px;margin-top:4rem;">
-    <div class="card">
-        <div class="card-body">
-            <h5 class="card-title mb-3">Admin Login</h5>
+<div class="login-wrapper">
+
+    <div class="login-visual">
+        <div class="login-visual-bg"></div>
+        <div class="login-visual-content">
+            <a href="{{ url('/') }}" class="login-logo">
+                Pasir Putih <span>Toba</span>
+            </a>
+            <div class="login-visual-quote">
+                <p>"Keindahan alam Danau Toba adalah warisan yang harus kita jaga bersama."</p>
+                <div class="quote-line"></div>
+            </div>
+            <div class="login-visual-stats">
+                <div class="vs-item">
+                    <span class="vs-num">5K+</span>
+                    <span class="vs-label">Pengunjung / Bulan</span>
+                </div>
+                <div class="vs-divider"></div>
+                <div class="vs-item">
+                    <span class="vs-num">4.8</span>
+                    <span class="vs-label">Rating Rata-rata</span>
+                </div>
+                <div class="vs-divider"></div>
+                <div class="vs-item">
+                    <span class="vs-num">15+</span>
+                    <span class="vs-label">Fasilitas</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="login-form-panel">
+        <div class="login-form-inner">
+
+            <a href="{{ url('/') }}" class="back-link">
+                <i class="fas fa-arrow-left"></i> Kembali ke Website
+            </a>
+
+            <div class="login-form-header">
+                <div class="login-badge">
+                    <i class="fas fa-shield-halved"></i>
+                </div>
+                <h1>Selamat Datang</h1>
+                <p>Masuk ke panel admin Pantai Pasir Putih Toba</p>
+            </div>
 
             @if(session('error'))
-                <div class="alert alert-danger">{{ session('error') }}</div>
+                <div class="login-alert login-alert-error">
+                    <i class="fas fa-exclamation-circle"></i>
+                    {{ session('error') }}
+                </div>
             @endif
 
-            <form method="POST" action="{{ route('login.post') }}">
+            @if(session('success'))
+                <div class="login-alert login-alert-success">
+                    <i class="fas fa-check-circle"></i>
+                    {{ session('success') }}
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('login.post') }}" class="login-form">
                 @csrf
 
-                <div class="mb-3">
-                    <label class="form-label">Email</label>
-                    <input type="email" name="email" value="{{ old('email') }}" class="form-control" required autofocus>
-                    @error('email') <div class="text-danger small">{{ $message }}</div> @enderror
-                </div>
-
-                <div class="mb-3">
-                    <label class="form-label">Password</label>
-
-                    <div class="password-wrapper">
-
-                        <input type="password" name="password" id="password" class="form-control" required>
-
-                        <span class="toggle-password" id="togglePassword">
-                            <i class="bi bi-eye"></i>
-                        </span>
-
+                <div class="form-group {{ $errors->has('email') ? 'has-error' : '' }}">
+                    <label for="email">Email</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-envelope input-icon"></i>
+                        <input type="email" name="email" id="email"
+                            value="{{ old('email') }}"
+                            placeholder="admin@pasirputihtoba.com"
+                            autocomplete="email" autofocus required>
                     </div>
-
-                    @error('password')
-                        <div class="text-danger small">{{ $message }}</div>
+                    @error('email')
+                        <span class="field-error">
+                            <i class="fas fa-circle-exclamation"></i> {{ $message }}
+                        </span>
                     @enderror
                 </div>
 
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div>
-                        <input type="checkbox" name="remember" id="remember"> <label for="remember">Remember</label>
+                <div class="form-group {{ $errors->has('password') ? 'has-error' : '' }}">
+                    <label for="password">Password</label>
+                    <div class="input-wrapper">
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" name="password" id="password"
+                            placeholder="••••••••"
+                            autocomplete="current-password" required>
+                        <button type="button" class="toggle-pw" id="togglePassword" tabindex="-1">
+                            <i class="fas fa-eye" id="eyeIcon"></i>
+                        </button>
                     </div>
-                    <button type="submit" class="btn btn-primary">Login</button>
+                    @error('password')
+                        <span class="field-error">
+                            <i class="fas fa-circle-exclamation"></i> {{ $message }}
+                        </span>
+                    @enderror
                 </div>
 
+                <div class="form-remember">
+                    <label class="remember-label">
+                        <input type="checkbox" name="remember" id="remember"
+                            {{ old('remember') ? 'checked' : '' }}>
+                        <span class="checkmark"></span>
+                        Ingat saya selama 30 hari
+                    </label>
+                </div>
+
+                <button type="submit" class="btn-login" id="loginBtn">
+                    <span class="btn-text">Masuk ke Dashboard</span>
+                    <i class="fas fa-arrow-right btn-icon"></i>
+                </button>
             </form>
+
+            <div class="login-footer">
+                <p>Bukan admin? <a href="{{ url('/') }}">Kunjungi website</a></p>
+            </div>
+
         </div>
     </div>
+
 </div>
 @endsection
