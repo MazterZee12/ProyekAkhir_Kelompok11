@@ -13,17 +13,15 @@ class DashboardController extends Controller
      * Tampilkan halaman dashboard.
      */
     public function index()
-    {
-        $totalUsers         = User::where('role', 'visitor')->count();
-        $totalReviews       = Review::count();
-        $pendingReviews     = Review::pending()->count();
-        $approvedReviews    = Review::approved()->count();
-        $recentReviews      = Review::with('user')->latest()->take(5)->get();
-        $totalAnnouncements = Announcement::count();
+{
+    $totalUsers          = User::where('role', 'user')->count();
+        $totalReviews        = Review::count();
+        $totalAnnouncements  = Announcement::count();
         $activeAnnouncements = Announcement::where('is_active', true)->count();
-        $totalGalleries     = Gallery::count();
-        $recentReviews      = Review::with('user')->latest()->take(5)->get();
+        $totalGalleries      = Gallery::count();
+        $recentReviews       = Review::with('user')->latest()->take(5)->get();
         $recentAnnouncements = Announcement::latest()->take(5)->get();
+        $averageRating       = Review::avg('rating') ?? 0;
 
         /**
          * Distribusi rating 1 sampai 5
@@ -36,14 +34,13 @@ class DashboardController extends Controller
         return view('admin.dashboard', compact(
             'totalUsers',
             'totalReviews',
-            'pendingReviews',
-            'approvedReviews',
             'totalAnnouncements',
             'activeAnnouncements',
             'totalGalleries',
             'recentReviews',
             'recentAnnouncements',
-            'ratingDistribution'
+            'ratingDistribution',
+            'averageRating',
         ));
     }
 }

@@ -1,16 +1,3 @@
-// ===== TOGGLE PASSWORD =====
-const toggleBtn     = document.getElementById('togglePassword');
-const passwordInput = document.getElementById('password');
-const eyeIcon       = document.getElementById('eyeIcon');
-
-if (toggleBtn && passwordInput) {
-    toggleBtn.addEventListener('click', () => {
-        const isPassword = passwordInput.type === 'password';
-        passwordInput.type = isPassword ? 'text' : 'password';
-        eyeIcon.className  = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
-    });
-}
-
 // ===== LOADING STATE ON SUBMIT =====
 const loginBtn  = document.getElementById('loginBtn');
 const loginForm = document.querySelector('.login-form');

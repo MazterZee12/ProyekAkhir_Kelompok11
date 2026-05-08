@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('title', 'Login — Pantai Pasir Putih Toba')
+@section('title', 'Masuk — Pantai Pasir Putih Toba')
 
 @section('content')
 <div class="login-wrapper">
@@ -43,11 +43,17 @@
 
             <div class="login-form-header">
                 <div class="login-badge">
-                    <i class="fas fa-shield-halved"></i>
+                    <i class="fas fa-user"></i>
                 </div>
                 <h1>Selamat Datang</h1>
-                <p>Masuk ke panel admin Pantai Pasir Putih Toba</p>
+                <p>Masuk untuk berbagi pengalamanmu di Pantai Pasir Putih Toba</p>
             </div>
+
+            @if(session('info'))
+                <div class="login-alert login-alert-info">
+                    <i class="fas fa-clock"></i> {{ session('info') }}
+                </div>
+            @endif
 
             @if(session('error'))
                 <div class="login-alert login-alert-error">
@@ -72,7 +78,7 @@
                         <i class="fas fa-envelope input-icon"></i>
                         <input type="email" name="email" id="email"
                             value="{{ old('email') }}"
-                            placeholder="admin@pasirputihtoba.com"
+                            placeholder="email@contoh.com"
                             autocomplete="email" autofocus required>
                     </div>
                     @error('email')
@@ -110,17 +116,38 @@
                 </div>
 
                 <button type="submit" class="btn-login" id="loginBtn">
-                    <span class="btn-text">Masuk ke Dashboard</span>
+                    <span class="btn-text">Masuk</span>
                     <i class="fas fa-arrow-right btn-icon"></i>
                 </button>
             </form>
 
-            <div class="login-footer">
-                <p>Bukan admin? <a href="{{ url('/') }}">Kunjungi website</a></p>
+            <div class="login-divider">
+                <span>atau</span>
             </div>
 
+            <a href="{{ route('register') }}" class="btn-register-alt">
+                <i class="fas fa-user-plus"></i>
+                Buat Akun Baru
+            </a>
         </div>
     </div>
 
 </div>
 @endsection
+
+
+
+@push('scripts')
+<script>
+const toggleBtn     = document.getElementById('togglePassword');
+const passwordInput = document.getElementById('password');
+const eyeIcon       = document.getElementById('eyeIcon');
+if (toggleBtn && passwordInput) {
+    toggleBtn.addEventListener('click', () => {
+        const isPassword = passwordInput.type === 'password';
+        passwordInput.type = isPassword ? 'text' : 'password';
+        eyeIcon.className  = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
+    });
+}
+</script>
+@endpush

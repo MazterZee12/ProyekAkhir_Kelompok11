@@ -13,14 +13,8 @@ class ReviewController extends Controller
     {
         $query = Review::with('user')->orderByDesc('created_at');
 
-        if ($request->filled('status')) {
-            match ($request->status) {
-                'approved' => $query->approved(),
-                'pending' => $query->pending(),
-                'hidden' => $query->hidden(),
-                'trashed' => $query->onlyTrashed(),
-                default => null
-            };
+        if ($request->filled('status') && $request->status === 'trashed') {
+            $query->onlyTrashed();
         }
 
         $reviews = $query->paginate(20);
@@ -35,24 +29,19 @@ class ReviewController extends Controller
     public function update(Request $request, Review $review)
     {
         $data = $request->validate([
-            'rating' => 'required|integer|min:1|max:5',
+            'rating'  => 'required|numeric|in:0.5,1,1.5,2,2.5,3,3.5,4,4.5,5',
             'comment' => 'nullable|string',
-            'approved' => 'nullable|boolean',
         ]);
-
-        $data['approved'] = $request->has('approved');
 
         try {
             $review->update($data);
-
             return redirect()
                 ->route('admin.reviews.index')
-                ->with('success', 'Review updated successfully.');
-
+                ->with('success', 'Review berhasil diperbarui.');
         } catch (\Exception $e) {
             Log::error('ReviewController::update failed', [
                 'id'    => $review->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
             return back()->withInput()->with('error', 'Gagal memperbarui review.');
         }
@@ -62,15 +51,13 @@ class ReviewController extends Controller
     {
         try {
             $review->delete();
-
             return redirect()
                 ->route('admin.reviews.index')
-                ->with('success', 'Review deleted.');
-
+                ->with('success', 'Review dihapus.');
         } catch (\Exception $e) {
             Log::error('ReviewController::destroy failed', [
                 'id'    => $review->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
             return redirect()
                 ->route('admin.reviews.index')
@@ -83,15 +70,13 @@ class ReviewController extends Controller
         try {
             $review = Review::withTrashed()->findOrFail($id);
             $review->restore();
-
             return redirect()
                 ->route('admin.reviews.index')
-                ->with('success', 'Review restored.');
-
+                ->with('success', 'Review dipulihkan.');
         } catch (\Exception $e) {
             Log::error('ReviewController::restore failed', [
                 'id'    => $id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
             return redirect()
                 ->route('admin.reviews.index')
@@ -99,46 +84,20 @@ class ReviewController extends Controller
         }
     }
 
-    public function toggleApproval(Review $review)
-    {
-        try {
-            $review->approved = !$review->approved;
-            $review->save();
-
-            return back()->with('success', 'Review status updated.');
-
-        } catch (\Exception $e) {
-            Log::error('ReviewController::toggleApproval failed', [
-                'id'    => $review->id,
-                'error' => $e->getMessage()
-            ]);
-            return back()->with('error', 'Gagal memperbarui status review.');
-        }
-    }
-
     public function stats()
     {
-        $baseQuery = Review::approved();
-
-        $total = $baseQuery->count();
-        $averageRating = round($baseQuery->avg('rating'), 2);
-        $breakdown = [
-            5 => (clone $baseQuery)->where('rating', 5)->count(),
-            4 => (clone $baseQuery)->where('rating', 4)->count(),
-            3 => (clone $baseQuery)->where('rating', 3)->count(),
-            2 => (clone $baseQuery)->where('rating', 2)->count(),
-            1 => (clone $baseQuery)->where('rating', 1)->count(),
-        ];
-        $pending = Review::pending()->count();
-        $hidden = Review::hidden()->count();
+        $total         = Review::count();
+        $averageRating = round(Review::avg('rating'), 2);
+        $breakdown     = [];
+        for ($i = 5; $i >= 1; $i--) {
+            $breakdown[$i] = Review::where('rating', $i)->count();
+        }
         $trashed = Review::onlyTrashed()->count();
 
         return view('admin.reviews.stats', compact(
             'total',
             'averageRating',
             'breakdown',
-            'pending',
-            'hidden',
             'trashed'
         ));
     }
