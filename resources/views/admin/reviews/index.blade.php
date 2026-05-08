@@ -1,160 +1,64 @@
 @extends('layouts.admin')
 
-@section('title','Reviews')
+@section('title', 'Kelola Ulasan')
 
 @section('content')
-
 <div class="container-fluid">
 
-<div class="d-flex justify-content-between mb-3">
-    <h1>Reviews</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h4 class="fw-bold mb-0">Kelola Ulasan</h4>
+    </div>
 
-    <a href="{{ route('admin.reviews.stats') }}" class="btn btn-info">
-        Review Stats
-    </a>
-</div>
+    @if(session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
 
-
-<form method="GET" class="mb-3">
-
-<div class="row">
-
-<div class="col-md-3">
-<select name="status" class="form-control" onchange="this.form.submit()">
-
-<option value="">All</option>
-<option value="approved" {{ request('status')=='approved'?'selected':'' }}>Approved</option>
-<option value="pending" {{ request('status')=='pending'?'selected':'' }}>Pending</option>
-<option value="hidden" {{ request('status')=='hidden'?'selected':'' }}>Hidden</option>
-<option value="trashed" {{ request('status')=='trashed'?'selected':'' }}>Trashed</option>
-
-</select>
-</div>
-
-</div>
-
-</form>
-
-
-@if(session('success'))
-<div class="alert alert-success">
-{{ session('success') }}
-</div>
-@endif
-
-
-<div class="card">
-<div class="card-body">
-
-<table class="table table-bordered">
-
-<thead>
-<tr>
-<th>ID</th>
-<th>User</th>
-<th>Rating</th>
-<th>Comment</th>
-<th>Status</th>
-<th width="220">Actions</th>
-</tr>
-</thead>
-
-<tbody>
-
-@foreach($reviews as $review)
-
-<tr>
-
-<td>{{ $review->id }}</td>
-
-<td>{{ $review->user->name ?? '-' }}</td>
-
-<td>{{ $review->rating }}</td>
-
-<td>{{ $review->comment }}</td>
-
-<td>
-
-@if($review->deleted_at)
-<span class="badge bg-danger">Trashed</span>
-
-@elseif($review->hidden_at)
-<span class="badge bg-warning">Hidden</span>
-
-@elseif($review->approved)
-<span class="badge bg-success">Approved</span>
-
-@else
-<span class="badge bg-secondary">Pending</span>
-@endif
-
-</td>
-
-<td>
-
-@if(!$review->deleted_at)
-
-<a href="{{ route('admin.reviews.edit',$review) }}" class="btn btn-sm btn-primary">
-Edit
-</a>
-
-
-<form action="{{ route('admin.reviews.toggleApproval',$review) }}"
-method="POST"
-style="display:inline">
-
-@csrf
-
-<button class="btn btn-sm btn-info">
-Toggle
-</button>
-
-</form>
-
-
-<form action="{{ route('admin.reviews.destroy',$review) }}"
-method="POST"
-style="display:inline">
-
-@csrf
-@method('DELETE')
-
-<button class="btn btn-sm btn-danger">
-Delete
-</button>
-
-</form>
-
-@else
-
-<form action="{{ route('admin.reviews.restore',$review->id) }}"
-method="POST">
-
-@csrf
-
-<button class="btn btn-sm btn-success">
-Restore
-</button>
-
-</form>
-
-@endif
-
-</td>
-
-</tr>
-
-@endforeach
-
-</tbody>
-
-</table>
-
-{{ $reviews->links() }}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-sm table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Pengguna</th>
+                            <th>Rating</th>
+                            <th>Komentar</th>
+                            <th>Tanggal</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @forelse($reviews as $review)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
+                            <td>{{ $review->user->name ?? '-' }}</td>
+                            <td>
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="fas fa-star {{ $i <= $review->rating ? 'text-warning' : 'text-muted' }}" style="font-size:0.75rem"></i>
+                                @endfor
+                            </td>
+                            <td>{{ Str::limit($review->comment, 60) }}</td>
+                            <td>{{ $review->created_at->format('d M Y') }}</td>
+                            <td>
+                                <form action="{{ route('admin.reviews.destroy', $review) }}" method="POST"
+                                    onsubmit="return confirm('Hapus ulasan ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-sm btn-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="6" class="text-center text-muted">Belum ada ulasan</td></tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-3">{{ $reviews->links() }}</div>
+        </div>
+    </div>
 
 </div>
-</div>
-
-</div>
-
 @endsection

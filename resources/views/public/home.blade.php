@@ -4,18 +4,62 @@
 
 @section('content')
 
-{{-- HERO --}}
-<section class="hero">
-    <div class="hero-bg" style="background-image: url('{{ $heroBanner ? asset('storage/'.$heroBanner->image_path) : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80' }}')"></div>
-    <div class="hero-content">
-        <div class="hero-eyebrow">Danau Toba, Sumatera Utara</div>
-        <h1>{{ $profile->name ?? 'Surga Tersembunyi di' }} <em>Tepian Toba</em></h1>
-        <p>{{ $profile->description ?? 'Rasakan keindahan Pantai Pasir Putih Toba — hamparan pasir putih bersih, air danau yang jernih, dan pemandangan alam yang tak terlupakan.' }}</p>
-        <div class="hero-btns">
-            <a href="#gallery" class="btn-primary-hero">Jelajahi Sekarang</a>
-            <a href="#facilities" class="btn-outline-hero">Lihat Fasilitas</a>
-        </div>
+{{-- HERO CAROUSEL --}}
+<section class="hero" id="heroCarousel">
+    @forelse($heroBanners as $i => $banner)
+    <div class="hero-slide {{ $i === 0 ? 'active' : '' }}"
+        style="background-image:url('{{ $banner->image_path && file_exists(storage_path('app/public/'.$banner->image_path))
+            ? asset('storage/'.$banner->image_path)
+            : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80' }}')">
     </div>
+    @empty
+    <div class="hero-slide active"
+        style="background-image:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80')">
+    </div>
+    @endforelse
+
+    <div class="hero-bg-overlay"></div>
+
+    <div class="hero-content">
+        @forelse($heroBanners as $i => $banner)
+        <div class="hero-text {{ $i === 0 ? 'active' : '' }}">
+            <div class="hero-center">
+                <div class="hero-eyebrow">Danau Toba, Sumatera Utara</div>
+                <h1>{{ $banner->title }}</h1>
+                @if($banner->subtitle)
+                <p>{{ $banner->subtitle }}</p>
+                @endif
+            </div>
+            <div class="hero-btns-corner">
+                <a href="{{ $banner->url ?? '#gallery' }}" class="btn-primary-hero">Jelajahi Sekarang</a>
+                <a href="#facilities" class="btn-outline-hero">Lihat Fasilitas</a>
+            </div>
+        </div>
+        @empty
+        <div class="hero-text active">
+            <div class="hero-center">
+                <div class="hero-eyebrow">Danau Toba, Sumatera Utara</div>
+                <h1>{{ $profile->name ?? 'Surga Tersembunyi di' }} <em>Tepian Toba</em></h1>
+                <p>{{ $profile->description ?? 'Rasakan keindahan Pantai Pasir Putih Toba.' }}</p>
+            </div>
+            <div class="hero-btns-corner">
+                <a href="#gallery" class="btn-primary-hero">Jelajahi Sekarang</a>
+                <a href="#facilities" class="btn-outline-hero">Lihat Fasilitas</a>
+            </div>
+        </div>
+        @endforelse
+    </div>
+
+    @if($heroBanners->count() > 1)
+    <div class="hero-dots">
+        @foreach($heroBanners as $i => $banner)
+        <button class="hero-dot {{ $i === 0 ? 'active' : '' }}" data-index="{{ $i }}"></button>
+        @endforeach
+    </div>
+    <button class="hero-arrow hero-prev" id="heroPrev"><i class="fas fa-chevron-left"></i></button>
+    <button class="hero-arrow hero-next" id="heroNext"><i class="fas fa-chevron-right"></i></button>
+    @endif
+
     <div class="hero-scroll">Scroll</div>
 </section>
 
@@ -33,14 +77,14 @@
             <p>Nikmati berbagai aktivitas air seperti berenang, perahu, dan snorkeling di danau terbesar.</p>
         </div>
         <div class="feature-item reveal">
-            <div class="feature-icon"><i class="fas fa-utensils"></i></div>
-            <h4>Kuliner Lokal</h4>
-            <p>Sajian kuliner khas Batak yang autentik tersedia di kawasan wisata kami.</p>
+            <div class="feature-icon"><i class="fas fa-camera"></i></div>
+            <h4>Spot Foto</h4>
+            <p>Nikmati berbagai spot foto instagramable dengan latar pemandangan Danau Toba yang memukau.</p>
         </div>
         <div class="feature-item reveal">
-            <div class="feature-icon"><i class="fas fa-campground"></i></div>
-            <h4>Area Berkemah</h4>
-            <p>Fasilitas kemping dengan pemandangan langsung ke Danau Toba yang menakjubkan.</p>
+            <div class="feature-icon"><i class="fas fa-home"></i></div>
+            <h4>Budaya Batak</h4>
+            <p>Rasakan kekayaan budaya dan tradisi Batak yang autentik di kawasan wisata Danau Toba.</p>
         </div>
     </div>
 </section>
@@ -48,7 +92,7 @@
 {{-- ABOUT --}}
 <section class="about" id="about">
     <div class="about-image">
-        <img src="https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=80" alt="{{ $profile->name ?? 'Pantai Pasir Putih Toba' }}">
+        <img src="https://zjglidcehtsqqqhbdxyp.supabase.co/storage/v1/object/public/atourin/images/destination/toba/pantai-pasir-putih-parparean-profile1670997298.jpeg?x-image-process=image/resize,p_100,limit_1/imageslim" alt="{{ $profile->name ?? 'Pantai Pasir Putih Toba' }}">
     </div>
     <div class="about-content">
         <div class="section-label">Tentang Kami</div>
@@ -79,13 +123,18 @@
 {{-- GALLERY --}}
 <section class="gallery-section" id="gallery">
     <div class="gallery-header reveal">
-        <div class="section-label" style="justify-content:center">Galeri</div>
-        <h2>Keindahan yang <em>Tak Terlupakan</em></h2>
+        <div class="gallery-header-top">
+            <div>
+                <div class="section-label" style="justify-content:center">Galeri</div>
+                <h2>Keindahan yang <em>Tak Terlupakan</em></h2>
+            </div>
+            <a href="{{ url('/gallery') }}" class="view-all">Lihat Semua <i class="fas fa-arrow-right"></i></a>
+        </div>
     </div>
     <div class="bento-grid">
         @foreach($galleries->take(8) as $i => $gallery)
             <div class="bento-item bento-{{ $i + 1 }}">
-                <img src="{{ asset('storage/'.$gallery->photo_path) }}" alt="{{ $gallery->title ?? 'Galeri' }}">
+                <img src="{{ asset('storage/'.$gallery->file_path) }}" alt="{{ $gallery->title ?? 'Galeri' }}">
             </div>
         @endforeach
     </div>
@@ -131,15 +180,18 @@
     <div class="pricing-grid">
         @forelse($prices->take(3) as $i => $price)
             <div class="price-card {{ $i === 1 ? 'featured' : '' }} reveal">
-                <h4>{{ $price->name }}</h4>
-                <div class="price-amount">{{ number_format($price->price / 1000, 0) }}K</div>
+                <h4>{{ $price->unit }}</h4>
+                <div class="price-amount">{{ number_format($price->amount / 1000, 0) }}K</div>
                 <div class="price-unit">{{ $price->unit ?? 'per orang' }}</div>
                 <div class="price-divider"></div>
-                <div class="price-desc">{{ $price->description }}</div>
+                <div class="price-desc">{{ $price->notes }}</div>
             </div>
         @empty
             <p class="text-muted" style="color:rgba(255,255,255,0.5)">Belum ada harga.</p>
         @endforelse
+    </div>
+    <div class="pricing-footer reveal">
+        <a href="{{ url('/pricing') }}" class="view-all-light">Lihat Semua Harga <i class="fas fa-arrow-right"></i></a>
     </div>
 </section>
 
@@ -189,7 +241,13 @@
             <div class="review-card reveal">
                 <div class="review-stars">
                     @for($i = 1; $i <= 5; $i++)
-                        {{ $i <= $review->rating ? '★' : '☆' }}
+                        @if($review->rating >= $i)
+                            <i class="fas fa-star"></i>
+                        @elseif($review->rating >= $i - 0.5)
+                            <i class="fas fa-star-half-alt"></i>
+                        @else
+                            <i class="far fa-star"></i>
+                        @endif
                     @endfor
                 </div>
                 <div class="review-text">"{{ $review->comment }}"</div>
@@ -205,6 +263,9 @@
             <p style="color:rgba(255,255,255,0.5)">Belum ada ulasan.</p>
         @endforelse
     </div>
+    <div class="reviews-footer reveal">
+        <a href="{{ url('/reviews') }}" class="view-all-light">Lihat Semua Ulasan <i class="fas fa-arrow-right"></i></a>
+    </div>
 </section>
 
 {{-- CTA --}}
@@ -214,7 +275,7 @@
         <div class="section-label" style="justify-content:center; color:var(--gold)">Kunjungi Kami</div>
         <h2>Siap Merasakan <em>Keajaiban</em> Danau Toba?</h2>
         <p>Rencanakan kunjunganmu sekarang dan ciptakan kenangan indah bersama orang-orang tersayang.</p>
-        <a href="#contact" class="btn-primary-hero">Hubungi Kami</a>
+        <a href="{{ url('/contact') }}" class="btn-primary-hero">Hubungi Kami</a>
     </div>
 </section>
 

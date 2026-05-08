@@ -18,18 +18,18 @@ class HomeController extends Controller
      */
     public function index()
     {
-        $heroBanner    = Banner::where('is_active', true)->orderBy('order')->first();
-        $profile       = Profile::where('is_active', true)->first();
-        $galleries     = Gallery::latest()->take(8)->get();
-        $facilities    = Facility::latest()->take(3)->get();
-        $prices        = Price::latest()->take(3)->get();
-        $announcements = Announcement::where('is_active', true)->latest()->take(3)->get();
-        $reviews       = Review::approved()->with('user')->latest()->take(3)->get();
-        $avgRating     = Review::approved()->avg('rating') ?? 0;
+        $heroBanners     = Banner::where('is_active', true)->orderBy('order')->get();
+        $profile         = Profile::where('is_active', true)->first();
+        $galleries       = Gallery::where('status', 'published')->latest()->take(8)->get();
+        $facilities      = Facility::latest()->take(3)->get();
+        $prices          = Price::where('is_active', true)->latest()->take(3)->get();
+        $announcements   = Announcement::where('is_active', true)->latest()->take(3)->get();
+        $reviews         = Review::with('user')->latest()->take(3)->get();
+        $avgRating       = Review::avg('rating') ?? 0;
         $totalFacilities = Facility::count();
 
         return view('public.home', compact(
-            'heroBanner', 'profile', 'galleries', 'facilities',
+            'heroBanners', 'profile', 'galleries', 'facilities',
             'prices', 'announcements', 'reviews', 'avgRating', 'totalFacilities'
         ));
     }

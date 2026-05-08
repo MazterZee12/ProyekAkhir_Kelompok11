@@ -28,7 +28,7 @@
             <div class="stat-card" style="background: linear-gradient(135deg,#0c4a6e,#0284c7)">
                 <div class="stat-label">Ulasan</div>
                 <div class="stat-value">{{ $totalReviews }}</div>
-                <div class="stat-sub">{{ $pendingReviews }} menunggu moderasi</div>
+                <div class="stat-sub">Rata-rata {{ number_format($averageRating, 1) }} bintang</div>
                 <i class="fas fa-star stat-icon"></i>
             </div>
         </div>
@@ -52,25 +52,13 @@
 
     <!-- CHARTS -->
     <div class="row g-3 mb-4">
-        <!-- Rating Chart -->
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="card h-100">
                 <div class="card-body">
                     <h6 class="fw-semibold mb-3">
                         <i class="fas fa-chart-bar me-2 text-primary"></i>Distribusi Rating Ulasan
                     </h6>
-                    <canvas id="ratingChart" height="100"></canvas>
-                </div>
-            </div>
-        </div>
-        <!-- Review Status -->
-        <div class="col-md-4">
-            <div class="card h-100">
-                <div class="card-body">
-                    <h6 class="fw-semibold mb-3">
-                        <i class="fas fa-chart-pie me-2 text-primary"></i>Status Ulasan
-                    </h6>
-                    <canvas id="reviewStatusChart" height="180"></canvas>
+                    <canvas id="ratingChart" height="60"></canvas>
                 </div>
             </div>
         </div>
@@ -94,7 +82,6 @@
                                 <tr>
                                     <th>Nama</th>
                                     <th>Rating</th>
-                                    <th>Status</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -106,16 +93,9 @@
                                             <i class="fas fa-star {{ $i <= $review->rating ? 'text-warning' : 'text-muted' }}" style="font-size:0.7rem"></i>
                                         @endfor
                                     </td>
-                                    <td>
-                                        @if($review->approved)
-                                            <span class="badge bg-success">Disetujui</span>
-                                        @else
-                                            <span class="badge bg-warning text-dark">Pending</span>
-                                        @endif
-                                    </td>
                                 </tr>
                             @empty
-                                <tr><td colspan="3" class="text-center text-muted">Belum ada ulasan</td></tr>
+                                <tr><td colspan="2" class="text-center text-muted">Belum ada ulasan</td></tr>
                             @endforelse
                             </tbody>
                         </table>
@@ -175,7 +155,6 @@
 @push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-// Rating Distribution Chart
 const ratingCtx = document.getElementById('ratingChart').getContext('2d');
 new Chart(ratingCtx, {
     type: 'bar',
@@ -201,28 +180,6 @@ new Chart(ratingCtx, {
         scales: {
             y: { beginAtZero: true, ticks: { stepSize: 1 }, grid: { color: 'rgba(0,0,0,0.05)' } },
             x: { grid: { display: false } }
-        }
-    }
-});
-
-// Review Status Pie Chart
-const statusCtx = document.getElementById('reviewStatusChart').getContext('2d');
-new Chart(statusCtx, {
-    type: 'doughnut',
-    data: {
-        labels: ['Disetujui', 'Pending'],
-        datasets: [{
-            data: [{{ $approvedReviews }}, {{ $pendingReviews }}],
-            backgroundColor: ['rgba(74,29,150,0.85)', 'rgba(234,179,8,0.85)'],
-            borderWidth: 0,
-            hoverOffset: 6,
-        }]
-    },
-    options: {
-        responsive: true,
-        cutout: '65%',
-        plugins: {
-            legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 } } }
         }
     }
 });
