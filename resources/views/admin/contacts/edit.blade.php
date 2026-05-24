@@ -2,17 +2,19 @@
 
 @section('content')
 <div class="container">
-    <h4 class="mb-4">Edit Contact</h4>
-    <div class="card">
-        <div class="card-body">
-            <form action="{{ route('admin.contacts.update', $contact->id) }}" method="POST">
-                @csrf
-                @method('PUT')
+    <h4 class="mb-4">Edit Kontak</h4>
+    <form action="{{ route('admin.contacts.update', $contact->id) }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        @method('PUT')
+        <div class="card">
+            <div class="card-body">
                 @include('admin.contacts._form')
-                <button class="btn btn-primary">Update Contact</button>
-                <a href="{{ route('admin.contacts.index') }}" class="btn btn-secondary">Cancel</a>
-            </form>
+                <div class="mt-4 d-flex gap-2">
+                    <button class="btn btn-primary">Update</button>
+                    <a href="{{ route('admin.contacts.index') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </div>
         </div>
-    </div>
+    </form>
 </div>
 @endsection

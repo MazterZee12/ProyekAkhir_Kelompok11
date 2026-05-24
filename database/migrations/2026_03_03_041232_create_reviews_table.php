@@ -14,8 +14,9 @@ return new class extends Migration
             $table->decimal('rating', 2, 1)->unsigned();
             $table->text('comment');
             $table->unsignedInteger('reports_count')->default(0);
+            $table->boolean('is_hidden')->default(false);
+            $table->json('report_reasons')->nullable();
             $table->timestamps();
-            $table->softDeletes();
         });
     }
 

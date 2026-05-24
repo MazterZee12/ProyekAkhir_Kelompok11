@@ -13,9 +13,8 @@ class Profile extends Model
         'vision',
         'mission',
         'established_year',
-        'opening_hours',
         'regulations',
-        'logo_path',
+        'photo_path',
         'is_active'
     ];
 

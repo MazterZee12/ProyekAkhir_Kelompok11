@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('title', 'Masuk — Pantai Pasir Putih Toba')
+@section('title', 'Masuk — Pasir Putih Parparean')
 
 @section('content')
 <div class="login-wrapper">
@@ -8,7 +8,7 @@
     <div class="login-visual">
         <div class="login-visual-bg"></div>
         <div class="login-visual-content">
-            <a href="{{ url('/') }}" class="login-logo">
+            <a href="{{ url('') }}" class="login-logo">
                 Pasir Putih <span>Toba</span>
             </a>
             <div class="login-visual-quote">
@@ -46,7 +46,7 @@
                     <i class="fas fa-user"></i>
                 </div>
                 <h1>Selamat Datang</h1>
-                <p>Masuk untuk berbagi pengalamanmu di Pantai Pasir Putih Toba</p>
+                <p>Masuk untuk berbagi pengalamanmu di Pasir Putih Parparean</p>
             </div>
 
             @if(session('info'))

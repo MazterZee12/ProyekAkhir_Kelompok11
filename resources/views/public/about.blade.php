@@ -1,10 +1,12 @@
 @extends('layouts.public')
-@section('title', 'Tentang Kami — Pantai Pasir Putih Toba')
+
+@section('title', 'Tentang Kami — Pasir Putih Parparean')
+
 @section('content')
 
 {{-- HERO --}}
 <section class="page-hero">
-    <div class="page-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1600&q=80')"></div>
+    <div class="page-hero-bg" style="background-image:url('https://mistar.id/_next/image?url=https%3A%2F%2Ffiles-manager.mistar.id%2Fuploads%2FMISTAR%2F27-09-2025%2Fpantai_pasir_putih_parparean_di_toba_jadi_tempat_favorit_bersantai_keluarga_2025-09-27_16-55-46_2667.jpg&w=750&q=75')"></div>
     <div class="page-hero-overlay"></div>
     <div class="page-hero-content reveal">
         <div class="section-label" style="justify-content:center;color:var(--gold)">Tentang Kami</div>
@@ -18,12 +20,12 @@
     <div class="container">
         <div class="about-grid">
             <div class="about-grid-img reveal">
-                <img src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80" alt="Pantai Pasir Putih Toba" style="width:100%;border-radius:16px;object-fit:cover;height:420px;">
+                <img src="https://www.ninna.id/wp-content/uploads/2021/11/pantai-landai-2.jpg" alt="Pasir Putih Parparean" style="width:100%;border-radius:16px;object-fit:cover;height:420px;">
             </div>
             <div class="about-grid-content reveal">
                 <div class="section-label" style="color:var(--ocean)">Deskripsi</div>
-                <h2>{{ $profile->name ?? 'Pantai Pasir Putih Toba' }}</h2>
-                <p>{{ $profile->description ?? 'Pantai Pasir Putih Toba adalah destinasi wisata alam yang menawarkan keindahan tepi Danau Toba dengan hamparan pasir putih yang bersih dan pemandangan yang memukau.' }}</p>
+                <h2>{{ $profile->name ?? 'Pasir Putih Parparean' }}</h2>
+                <p>{{ $profile->description ?? 'Pasir Putih Parparean adalah destinasi wisata alam yang menawarkan keindahan tepi Danau Toba dengan hamparan pasir putih yang bersih dan pemandangan yang memukau.' }}</p>
                 @if($profile?->established_year)
                 <div class="stat-badge">
                     <span>Berdiri sejak</span>

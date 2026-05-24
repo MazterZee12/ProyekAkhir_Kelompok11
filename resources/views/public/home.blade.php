@@ -1,6 +1,6 @@
 @extends('layouts.public')
 
-@section('title', 'Pantai Pasir Putih Toba — Surga di Tepian Danau Toba')
+@section('title', 'Pasir Putih Parparean — Surga di Tepian Danau Toba')
 
 @section('content')
 
@@ -10,11 +10,11 @@
     <div class="hero-slide {{ $i === 0 ? 'active' : '' }}"
         style="background-image:url('{{ $banner->image_path && file_exists(storage_path('app/public/'.$banner->image_path))
             ? asset('storage/'.$banner->image_path)
-            : 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80' }}')">
+            : 'https://tourismdanautoba.site/image/Pantai%20Pasir%20Putih%20Parparean.jpg' }}')">
     </div>
     @empty
     <div class="hero-slide active"
-        style="background-image:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80')">
+        style="background-image:url('https://tourismdanautoba.site/image/Pantai%20Pasir%20Putih%20Parparean.jpg')">
     </div>
     @endforelse
 
@@ -40,7 +40,7 @@
             <div class="hero-center">
                 <div class="hero-eyebrow">Danau Toba, Sumatera Utara</div>
                 <h1>{{ $profile->name ?? 'Surga Tersembunyi di' }} <em>Tepian Toba</em></h1>
-                <p>{{ $profile->description ?? 'Rasakan keindahan Pantai Pasir Putih Toba.' }}</p>
+                <p>{{ $profile->description ?? 'Rasakan keindahan Pasir Putih Parparean.' }}</p>
             </div>
             <div class="hero-btns-corner">
                 <a href="#gallery" class="btn-primary-hero">Jelajahi Sekarang</a>
@@ -92,7 +92,7 @@
 {{-- ABOUT --}}
 <section class="about" id="about">
     <div class="about-image">
-        <img src="https://zjglidcehtsqqqhbdxyp.supabase.co/storage/v1/object/public/atourin/images/destination/toba/pantai-pasir-putih-parparean-profile1670997298.jpeg?x-image-process=image/resize,p_100,limit_1/imageslim" alt="{{ $profile->name ?? 'Pantai Pasir Putih Toba' }}">
+        <img src="https://zjglidcehtsqqqhbdxyp.supabase.co/storage/v1/object/public/atourin/images/destination/toba/pantai-pasir-putih-parparean-profile1670997298.jpeg?x-image-process=image/resize,p_100,limit_1/imageslim" alt="{{ $profile->name ?? 'Pasir Putih Parparean' }}">
     </div>
     <div class="about-content">
         <div class="section-label">Tentang Kami</div>
@@ -101,7 +101,7 @@
             <p>{{ $profile->history }}</p>
             <p>{{ $profile->vision }}</p>
         @else
-            <p>Pantai Pasir Putih Toba adalah destinasi wisata alam yang menawarkan keindahan tepi Danau Toba dengan hamparan pasir putih yang bersih dan pemandangan yang memukau.</p>
+            <p>Pasir Putih Parparean adalah destinasi wisata alam yang menawarkan keindahan tepi Danau Toba dengan hamparan pasir putih yang bersih dan pemandangan yang memukau.</p>
         @endif
         <div class="about-stats">
             <div class="stat-item">
@@ -175,7 +175,7 @@
     <div class="pricing-header reveal">
         <div class="section-label" style="justify-content:center; color:var(--gold)">Tiket Masuk</div>
         <h2>Harga Terjangkau, Pengalaman Tak Ternilai</h2>
-        <p>Nikmati keindahan Pantai Pasir Putih Toba dengan harga yang ramah di kantong</p>
+        <p>Nikmati keindahan Pasir Putih Parparean dengan harga yang ramah di kantong</p>
     </div>
     <div class="pricing-grid">
         @forelse($prices->take(3) as $i => $price)
@@ -270,7 +270,7 @@
 
 {{-- CTA --}}
 <section class="cta-section">
-    <div class="cta-bg" style="background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80')"></div>
+    <div class="cta-bg" style="background-image: url('https://www.itrip.id/wp-content/uploads/2023/10/Alamat-Pantai-Pasir-Putih-Parparean.webp')"></div>
     <div class="cta-content reveal">
         <div class="section-label" style="justify-content:center; color:var(--gold)">Kunjungi Kami</div>
         <h2>Siap Merasakan <em>Keajaiban</em> Danau Toba?</h2>

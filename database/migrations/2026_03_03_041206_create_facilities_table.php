@@ -10,14 +10,13 @@ return new class extends Migration
     {
         Schema::create('facilities', function (Blueprint $table) {
             $table->id();
-            $table->string('name');                    // Nama fasilitas: "Pemandu Wisata", "Kamar Bilas"
-            $table->text('description')->nullable();   // Deskripsi detail
-            $table->string('photo_path')->nullable();  // Foto fasilitas
-            $table->softDeletes();
+            $table->string('name');
+            $table->text('description')->nullable();
+            $table->string('photo_path')->nullable();
             $table->timestamps();
         });
     }
-
+    
     public function down(): void
     {
         Schema::dropIfExists('facilities');

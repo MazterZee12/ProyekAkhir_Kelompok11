@@ -31,7 +31,8 @@ class FacilityController extends Controller
      */
     public function create()
     {
-        return view('admin.facilities.create');
+        $facility = null;
+        return view('admin.facilities.create', compact('facility'));
     }
 
     /**

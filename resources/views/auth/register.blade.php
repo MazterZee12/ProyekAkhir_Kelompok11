@@ -1,6 +1,6 @@
 @extends('layouts.auth')
 
-@section('title', 'Daftar Akun — Pantai Pasir Putih Toba')
+@section('title', 'Daftar Akun — Pasir Putih Parparean')
 
 @section('content')
 <div class="login-wrapper register-wrapper">

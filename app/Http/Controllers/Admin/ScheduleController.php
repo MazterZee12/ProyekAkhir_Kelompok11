@@ -23,7 +23,8 @@ class ScheduleController extends Controller
      */
     public function create()
     {
-        return view('admin.schedules.create');
+        $schedule = null;
+        return view('admin.schedules.create', compact('schedule'));
     }
 
     /**
@@ -101,8 +102,8 @@ class ScheduleController extends Controller
 
         $data = $request->validate([
             'day'            => 'required|string|max:50',
-            'open_time'      => 'required|date_format:H:i,H.i',
-            'close_time'     => 'required|date_format:H:i,H.i|after:open_time',
+            'open_time'      => 'required|date_format:H:i',
+            'close_time'     => 'required|date_format:H:i|after_or_equal:open_time',
             'capacity'       => 'nullable|integer|min:0',
             'best_time'      => 'nullable|string|max:255',
             'parking_info'   => 'nullable|string',

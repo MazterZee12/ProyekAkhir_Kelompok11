@@ -15,16 +15,10 @@ class Contact extends Model
         'facebook',
         'youtube',
         'twitter',
-        'is_active',
-        'views'
+        'is_active'
     ];
 
     protected $casts = [
         'is_active' => 'boolean'
     ];
-
-    public function incrementViews()
-    {
-        $this->increment('views');
-    }
 }

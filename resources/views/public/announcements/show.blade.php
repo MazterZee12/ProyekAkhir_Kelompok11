@@ -1,5 +1,5 @@
 @extends('layouts.public')
-@section('title', $announcement->title . ' — Pantai Pasir Putih Toba')
+@section('title', $announcement->title . ' — Pasir Putih Parparean')
 @section('content')
 
 <section style="padding:60px 0 80px; background:var(--bg); min-height:calc(100vh - 72px)">

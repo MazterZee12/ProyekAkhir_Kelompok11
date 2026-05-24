@@ -1,9 +1,9 @@
 @extends('layouts.public')
-@section('title', 'Jadwal Kunjungan — Pantai Pasir Putih Toba')
+@section('title', 'Jadwal Kunjungan — Pasir Putih Parparean')
 @section('content')
 
 <section class="page-hero">
-    <div class="page-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80')"></div>
+    <div class="page-hero-bg" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRuPxAwSp-id1UkplYjZf32Vw4bg4nzsMTfwg&s')"></div>
     <div class="page-hero-overlay"></div>
     <div class="page-hero-content reveal">
         <div class="section-label" style="justify-content:center;color:var(--gold)">Jadwal</div>

@@ -35,39 +35,6 @@ class AuthController extends Controller
             ->with('error', 'Email atau password salah.');
     }
 
-    // public function showAdminLoginForm()
-    // {
-    //     if (Auth::check() && Auth::user()->role === 'admin') {
-    //         return redirect()->route('admin.dashboard');
-    //     }
-    //     return view('auth.adminLogin');
-    // }
-
-    // public function adminLogin(Request $request)
-    // {
-    //     $credentials = $request->validate([
-    //         'email'    => ['required', 'email'],
-    //         'password' => ['required'],
-    //     ]);
-
-    //     if (Auth::attempt($credentials, $request->boolean('remember'))) {
-    //         $request->session()->regenerate();
-
-    //         if (Auth::user()->role !== 'admin') {
-    //             Auth::logout();
-    //             return back()
-    //                 ->withInput($request->only('email'))
-    //                 ->with('error', 'Akun ini tidak memiliki akses admin.');
-    //         }
-
-    //         return redirect()->route('admin.dashboard');
-    //     }
-
-    //     return back()
-    //         ->withInput($request->only('email', 'remember'))
-    //         ->with('error', 'Email atau password salah.');
-    // }
-
     public function showRegisterForm()
     {
         if (Auth::check()) {
@@ -102,7 +69,7 @@ class AuthController extends Controller
         Auth::login($user);
 
         return redirect()
-            ->route('home')
+            ->route('reviews.create')
             ->with('success', 'Akun berhasil dibuat! Selamat datang, ' . $user->name . '.');
     }
 
@@ -119,6 +86,6 @@ class AuthController extends Controller
         if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');
         }
-        return redirect()->route('home');
+        return redirect()->route('reviews.create');
     }
 }

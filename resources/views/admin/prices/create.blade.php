@@ -1,26 +1,19 @@
 @extends('layouts.admin')
 
 @section('content')
-
-<h4>Create Price</h4>
-
-<form method="POST"
-action="{{ route('admin.prices.store') }}"
-enctype="multipart/form-data">
-
-@csrf
-
-@include('admin.prices._form')
-
-<button class="btn btn-primary">
-Save
-</button>
-
-<a href="{{ route('admin.prices.index') }}"
-class="btn btn-secondary">
-Back
-</a>
-
-</form>
-
+<div class="container">
+    <h4 class="mb-4">Buat Harga</h4>
+    <form action="{{ route('admin.prices.store') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div class="card">
+            <div class="card-body">
+                @include('admin.prices._form')
+                <div class="mt-4 d-flex gap-2">
+                    <button class="btn btn-primary">Save</button>
+                    <a href="{{ route('admin.prices.index') }}" class="btn btn-secondary">Cancel</a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
 @endsection

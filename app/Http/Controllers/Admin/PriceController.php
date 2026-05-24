@@ -17,9 +17,6 @@ class PriceController extends Controller
         $this->upload = $upload;
     }
 
-    /**
-     * Tampilkan daftar harga.
-     */
     public function index()
     {
         $prices = Price::orderBy('type')
@@ -28,25 +25,20 @@ class PriceController extends Controller
         return view('admin.prices.index', compact('prices'));
     }
 
-    /**
-     * Form create
-     */
     public function create()
     {
-        return view('admin.prices.create');
+        $price = null;
+        return view('admin.prices.create', compact('price'));
     }
 
-    /**
-     * Store
-     */
     public function store(Request $request)
     {
         $data = $request->validate([
-            'type' => 'required|in:ticket,rental',
+            'type'   => 'required|in:ticket,rental',
             'amount' => 'required|numeric|min:0',
-            'unit' => 'required|string|max:50',
-            'notes' => 'nullable|string',
-            'photo' => 'nullable|image|max:10240',
+            'unit'   => 'required|string|max:50',
+            'notes'  => 'nullable|string',
+            'photo'  => 'nullable|image|max:10240',
         ]);
 
         $data['is_active'] = $request->boolean('is_active');
@@ -66,9 +58,7 @@ class PriceController extends Controller
                 ->with('success', 'Price created successfully.');
 
         } catch (\RuntimeException $e) {
-            // error dari FileUploadService
             return back()->withInput()->with('error', $e->getMessage());
-
         } catch (\Exception $e) {
             Log::error('PriceController::store failed', [
                 'error' => $e->getMessage()
@@ -77,33 +67,24 @@ class PriceController extends Controller
         }
     }
 
-    /**
-     * Show
-     */
     public function show(Price $price)
     {
         return view('admin.prices.show', compact('price'));
     }
 
-    /**
-     * Edit
-     */
     public function edit(Price $price)
     {
         return view('admin.prices.edit', compact('price'));
     }
 
-    /**
-     * Update
-     */
     public function update(Request $request, Price $price)
     {
         $data = $request->validate([
-            'type' => 'required|in:ticket,rental',
+            'type'   => 'required|in:ticket,rental',
             'amount' => 'required|numeric|min:0',
-            'unit' => 'required|string|max:50',
-            'notes' => 'nullable|string',
-            'photo' => 'nullable|image|max:10240',
+            'unit'   => 'required|string|max:50',
+            'notes'  => 'nullable|string',
+            'photo'  => 'nullable|image|max:10240',
         ]);
 
         $data['is_active'] = $request->boolean('is_active');
@@ -124,9 +105,7 @@ class PriceController extends Controller
                 ->with('success', 'Price updated.');
 
         } catch (\RuntimeException $e) {
-            // error dari FileUploadService
             return back()->withInput()->with('error', $e->getMessage());
-
         } catch (\Exception $e) {
             Log::error('PriceController::update failed', [
                 'id'    => $price->id,
@@ -136,9 +115,6 @@ class PriceController extends Controller
         }
     }
 
-    /**
-     * Delete
-     */
     public function destroy(Price $price)
     {
         try {
@@ -160,9 +136,6 @@ class PriceController extends Controller
         }
     }
 
-    /**
-     * Toggle
-     */
     public function toggle(Price $price)
     {
         try {
@@ -178,18 +151,5 @@ class PriceController extends Controller
             ]);
             return back()->with('error', 'Gagal memperbarui status harga.');
         }
-    }
-
-    /**
-     * Food gallery
-     */
-    public function foodGallery()
-    {
-        $foods = Price::where('type','rental')
-            ->whereNotNull('photo_path')
-            ->where('is_active',true)
-            ->latest()
-            ->get();
-        return view('admin.prices.food_gallery', compact('foods'));
     }
 }
