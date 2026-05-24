@@ -31,19 +31,15 @@ Route::get('/schedule',      [PublicController::class, 'schedule'])->name('publi
 Route::get('/faq',           [PublicController::class, 'faq'])->name('public.faq');
 Route::get('/contact',       [PublicController::class, 'contact'])->name('public.contact');
 Route::get('/announcements', [PublicController::class, 'announcements'])->name('public.announcements');
-Route::get('/announcements/{slug}', [PublicController::class, 'announcementShow'])->name('public.announcements.show');
+Route::get('/announcements/{announcement}', [PublicController::class, 'announcementShow'])
+    ->name('public.announcements.show');
 
 // Authentication routes
-Route::get('login', [AuthController::class, 'showLoginForm'])
-    ->name('login');
-Route::post('login', [AuthController::class, 'login'])
-    ->name('login.post');
-Route::get('register', [AuthController::class, 'showRegisterForm'])
-    ->name('register');
-Route::post('register', [AuthController::class, 'register'])
-    ->name('register.post');
-Route::post('logout', [AuthController::class, 'logout'])
-    ->name('logout');
+Route::get('login',    [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('login',   [AuthController::class, 'login'])->name('login.post');
+Route::get('register', [AuthController::class, 'showRegisterForm'])->name('register');
+Route::post('register',[AuthController::class, 'register'])->name('register.post');
+Route::post('logout',  [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/logout-session', function () {
     Auth::logout();
@@ -53,43 +49,47 @@ Route::get('/logout-session', function () {
 })->name('logout.session');
 
 Route::post('/chatbot', [App\Http\Controllers\ChatbotController::class, 'chat'])
-    ->name('chatbot')
-    ->middleware('throttle:30,1'); // maks 30 request per menit per IP
+    ->name('chatbot.chat')
+    ->middleware('throttle:30,1');
 
-// Admin section routes
+Route::get('/chatbot/status', [App\Http\Controllers\ChatbotController::class, 'status'])
+    ->name('chatbot.status');
+
+// Admin routes
 Route::middleware(['auth', EnsureAdmin::class])
     ->prefix('admin')->name('admin.')
     ->group(function () {
         Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
             ->name('dashboard');
 
-        // Reviews
-        Route::resource('reviews', ReviewController::class);
-        Route::post('reviews/{id}/restore', [ReviewController::class, 'restore'])
-            ->name('reviews.restore');
-        Route::get('reviews-stats', [ReviewController::class, 'stats'])
-            ->name('reviews.stats');
+        // Reviews — explicit routes only
+        Route::get('reviews',             [ReviewController::class, 'index'])->name('reviews.index');
+        Route::get('reviews/{review}',    [ReviewController::class, 'show'])->name('reviews.show');
+        Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
+        Route::patch('reviews/{review}/unhide', [ReviewController::class, 'unhide'])->name('reviews.unhide');
 
         // Prices
-        Route::get('prices/foods/gallery', [App\Http\Controllers\Admin\PriceController::class, 'foodGallery'])
-            ->name('prices.food.gallery');
         Route::resource('prices', App\Http\Controllers\Admin\PriceController::class);
+        Route::patch('prices/{price}/toggle', [App\Http\Controllers\Admin\PriceController::class, 'toggle'])
+            ->name('prices.toggle');
 
         // Resource controllers
-        Route::resource('galleries', App\Http\Controllers\Admin\GalleryController::class);
-        Route::resource('facilities', App\Http\Controllers\Admin\FacilityController::class);
-        Route::resource('profiles', App\Http\Controllers\Admin\ProfileController::class);
-        Route::resource('contacts', App\Http\Controllers\Admin\ContactController::class);
-        Route::resource('faqs', App\Http\Controllers\Admin\FaqController::class);
-        Route::resource('schedules', App\Http\Controllers\Admin\ScheduleController::class);
+        Route::resource('galleries',   App\Http\Controllers\Admin\GalleryController::class);
+        Route::resource('facilities',  App\Http\Controllers\Admin\FacilityController::class);
+        Route::resource('profiles',    App\Http\Controllers\Admin\ProfileController::class);
+        Route::resource('contacts',    App\Http\Controllers\Admin\ContactController::class);
+        Route::resource('faqs',        App\Http\Controllers\Admin\FaqController::class);
+        Route::resource('schedules',   App\Http\Controllers\Admin\ScheduleController::class);
 
         // Announcements
         Route::resource('announcements', App\Http\Controllers\Admin\AnnouncementController::class);
-        Route::patch('announcements/{announcement}/toggle', [App\Http\Controllers\Admin\AnnouncementController::class, 'toggle'])
+        Route::patch('announcements/{announcement}/toggle',
+            [App\Http\Controllers\Admin\AnnouncementController::class, 'toggle'])
             ->name('announcements.toggle');
 
         // Banners
         Route::resource('banners', App\Http\Controllers\Admin\BannerController::class);
-        Route::patch('banners/{banner}/toggle', [App\Http\Controllers\Admin\BannerController::class, 'toggle'])
+        Route::patch('banners/{banner}/toggle',
+            [App\Http\Controllers\Admin\BannerController::class, 'toggle'])
             ->name('banners.toggle');
     });

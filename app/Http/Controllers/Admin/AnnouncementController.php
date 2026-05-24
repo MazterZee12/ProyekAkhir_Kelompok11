@@ -22,7 +22,6 @@ class AnnouncementController extends Controller
      */
     public function index()
     {
-        Announcement::autoPublish();
         $announcements = Announcement::latest()->paginate(15);
         return view('admin.announcements.index', compact('announcements'));
     }
@@ -32,7 +31,8 @@ class AnnouncementController extends Controller
      */
     public function create()
     {
-        return view('admin.announcements.create');
+        $announcement = null;
+        return view('admin.announcements.create', compact('announcement'));
     }
 
     /**

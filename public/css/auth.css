@@ -1,3 +1,7 @@
+html {
+    font-size: 70%;
+}
+
 :root {
     --ocean: #1a4a5c;
     --ocean-light: #2d7a96;
@@ -35,7 +39,7 @@ body {
     inset: 0;
     background:
         linear-gradient(160deg, rgba(13,31,45,0.5) 0%, rgba(26,74,92,0.3) 50%, rgba(13,31,45,0.8) 100%),
-        url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1200&q=80') center/cover no-repeat;
+        url('https://thumbs.dreamstime.com/b/tranquil-boat-sunset-over-lake-toba-439168856.jpg') center/cover no-repeat;
     animation: bgPan 20s ease-in-out infinite alternate;
 }
 @keyframes bgPan {
@@ -359,7 +363,7 @@ body {
 .btn-login:disabled { opacity: 0.8 !important; cursor: not-allowed !important; transform: none !important; }
 
 /* ===== MOBILE FRIENDLY ===== */
-@media (max-width: 768px) {
+@media (max-width: 1080px) {
     body { overflow: auto !important; }
 
     .login-wrapper {

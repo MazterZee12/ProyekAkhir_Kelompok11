@@ -33,10 +33,10 @@
             <div class="chat-msg chat-msg-bot">
                 <div class="chat-msg-avatar"><i class="fas fa-umbrella-beach"></i></div>
                 <div class="chat-msg-bubble">
-                    Halo! 👋 Selamat datang di Pantai Pasir Putih Toba.<br>
+                    Halo! 👋 Selamat datang di Pasir Putih Parparean.<br>
                     Ada yang bisa saya bantu? Tanyakan tentang harga tiket, fasilitas, jadwal, atau info lainnya!
                     <br><br>
-                    Hello! Welcome to Pantai Pasir Putih Toba. How can I help you today?
+                    Hello! Welcome to Pasir Putih Parparean. How can I help you today?
                 </div>
             </div>
 
@@ -68,7 +68,7 @@
                 </button>
             </div>
             <div class="chat-footer-note">
-                Powered by AI · Pantai Pasir Putih Toba
+                Powered by AI · Pasir Putih Parparean
             </div>
         </div>
 

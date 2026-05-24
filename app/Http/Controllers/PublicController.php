@@ -34,15 +34,10 @@ class PublicController extends Controller
     }
 
     // /gallery
-    public function gallery(Request $request)
+    public function gallery()
     {
-        $type  = $request->query('type', 'all');
-        $query = Gallery::where('status', 'published');
-        if (in_array($type, ['photo', 'video'])) {
-            $query->where('type', $type);
-        }
-        $galleries = $query->latest()->paginate(12);
-        return view('public.gallery', compact('galleries', 'type'));
+        $galleries = Gallery::latest()->paginate(12);
+        return view('public.gallery', compact('galleries'));
     }
 
     // /pricing
@@ -66,11 +61,11 @@ class PublicController extends Controller
     }
 
     // /announcements/{slug}
-    public function announcementShow($slug)
+    public function announcementShow(Announcement $announcement)
     {
-        $announcement = Announcement::where('slug', $slug)
-            ->where('is_active', true)
-            ->firstOrFail();
+        if (!$announcement->is_active) {
+            abort(404);
+        }
         $announcement->increment('views');
         $related = Announcement::where('is_active', true)
             ->where('id', '!=', $announcement->id)
@@ -110,9 +105,9 @@ class PublicController extends Controller
                 ->with('info', 'Silakan login terlebih dahulu untuk memberikan ulasan.');
         }
 
-        $reviews       = Review::with('user')->latest()->paginate(9);
-        $averageRating = round(Review::avg('rating') ?? 0, 1); // sesuai nama di blade
-        $total         = Review::count();                       // sesuai nama di blade
+        $reviews = Review::with('user')->visible()->latest()->paginate(9);
+        $averageRating = round(Review::visible()->avg('rating') ?? 0, 1);
+        $total         = Review::visible()->count();
         $userReview    = Review::where('user_id', Auth::id())->first();
 
         return view('public.reviews.index', compact('reviews', 'averageRating', 'total', 'userReview'));

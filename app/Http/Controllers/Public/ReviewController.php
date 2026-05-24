@@ -13,9 +13,9 @@ class ReviewController extends Controller
     // Halaman semua review
     public function index()
     {
-        $reviews       = Review::with('user')->orderByDesc('created_at')->paginate(12);
+        $reviews       = Review::with('user')->visible()->orderByDesc('created_at')->paginate(12);
         $averageRating = round(Review::avg('rating'), 1);
-        $total         = Review::count();
+        $total         = Review::visible()->count();
         return view('public.reviews.index', compact('reviews', 'averageRating', 'total'));
     }
 
@@ -60,42 +60,45 @@ class ReviewController extends Controller
         }
     }
 
-    // Laporkan review
-    public function report(Review $review)
+    // Laporkan review — dengan alasan
+    public function report(Request $request, Review $review)
     {
         if ($review->user_id === Auth::id()) {
             return back()->with('error', 'Kamu tidak bisa melaporkan ulasanmu sendiri.');
         }
 
+        if (Auth::user()->role === 'admin') {
+            return back()->with('error', 'Admin tidak dapat melaporkan ulasan.');
+        }
+
+        $request->validate([
+            'reason' => 'required|in:spam,kata_kasar,tidak_relevan,lainnya',
+            'note'   => 'nullable|string|max:255',
+        ]);
+
+        // Jika lainnya dan ada note, simpan teks aslinya
+        $reasonLabels = [
+            'spam'          => 'Spam',
+            'kata_kasar'    => 'Kata Kasar',
+            'tidak_relevan' => 'Tidak Relevan',
+            'lainnya'       => 'Lainnya' . ($request->filled('note') ? ': ' . $request->note : ''),
+        ];
+
         try {
-            $review->increment('reports_count');
-            return back()->with('success', 'Laporan berhasil dikirim.');
+            $review->addReport($reasonLabels[$request->reason]);
+
+            $message = $review->is_hidden
+                ? 'Ulasan telah disembunyikan karena banyak laporan.'
+                : 'Ulasan berhasil dilaporkan.';
+
+            return back()->with('success', $message);
+
         } catch (\Exception $e) {
             Log::error('Public\ReviewController::report failed', [
                 'review_id' => $review->id,
                 'error'     => $e->getMessage(),
             ]);
-            return back()->with('error', 'Gagal mengirim laporan. Silakan coba lagi.');
-        }
-    }
-
-    // Hapus review milik sendiri
-    public function destroy(Review $review)
-    {
-        if (auth()->id() !== $review->user_id) {
-            abort(403);
-        }
-
-        try {
-            $review->delete();
-            return redirect()->route('reviews.index')
-                ->with('success', 'Ulasan kamu berhasil dihapus.');
-        } catch (\Exception $e) {
-            Log::error('Public\ReviewController::destroy failed', [
-                'review_id' => $review->id,
-                'error'     => $e->getMessage(),
-            ]);
-            return back()->with('error', 'Gagal menghapus ulasan. Silakan coba lagi.');
+            return back()->with('error', 'Gagal mengirim laporan.');
         }
     }
 }

@@ -20,7 +20,7 @@ class HomeController extends Controller
     {
         $heroBanners     = Banner::where('is_active', true)->orderBy('order')->get();
         $profile         = Profile::where('is_active', true)->first();
-        $galleries       = Gallery::where('status', 'published')->latest()->take(8)->get();
+        $galleries       = Gallery::latest()->take(8)->get();
         $facilities      = Facility::latest()->take(3)->get();
         $prices          = Price::where('is_active', true)->latest()->take(3)->get();
         $announcements   = Announcement::where('is_active', true)->latest()->take(3)->get();

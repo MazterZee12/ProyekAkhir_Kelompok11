@@ -12,7 +12,7 @@
     inset: 0;
     background:
         linear-gradient(to bottom, rgba(13,31,45,0.4) 0%, rgba(13,31,45,0.75) 100%),
-        url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80') center/cover no-repeat;
+        url('https://tobaria.com/wp-content/uploads/2021/04/IMG_20210415_144408-1024x576.jpg') center/cover no-repeat;
 }
 .page-header-content {
     position: relative;
@@ -93,7 +93,7 @@
     color: var(--dark);
     line-height: 1.7;
     margin-bottom: 20px;
-    word-break: break-word;W
+    word-break: break-word;
     overflow-wrap: break-word;
     white-space: normal;
 }

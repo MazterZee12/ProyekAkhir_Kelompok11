@@ -13,38 +13,25 @@ class ReviewController extends Controller
     {
         $query = Review::with('user')->orderByDesc('created_at');
 
-        if ($request->filled('status') && $request->status === 'trashed') {
-            $query->onlyTrashed();
+        if ($request->filled('status')) {
+            if ($request->status === 'trashed') {
+                $query->onlyTrashed();
+            } elseif ($request->status === 'hidden') {
+                $query->where('is_hidden', true);
+            } elseif ($request->status === 'reported') {
+                $query->where('reports_count', '>', 0);
+            }
         }
 
-        $reviews = $query->paginate(20);
-        return view('admin.reviews.index', compact('reviews'));
+        $reviews        = $query->paginate(20);
+        $reportedCount  = Review::where('reports_count', '>', 0)->where('is_hidden', false)->count();
+
+        return view('admin.reviews.index', compact('reviews', 'reportedCount'));
     }
 
-    public function edit(Review $review)
+    public function show(Review $review)
     {
-        return view('admin.reviews.edit', compact('review'));
-    }
-
-    public function update(Request $request, Review $review)
-    {
-        $data = $request->validate([
-            'rating'  => 'required|numeric|in:0.5,1,1.5,2,2.5,3,3.5,4,4.5,5',
-            'comment' => 'nullable|string',
-        ]);
-
-        try {
-            $review->update($data);
-            return redirect()
-                ->route('admin.reviews.index')
-                ->with('success', 'Review berhasil diperbarui.');
-        } catch (\Exception $e) {
-            Log::error('ReviewController::update failed', [
-                'id'    => $review->id,
-                'error' => $e->getMessage(),
-            ]);
-            return back()->withInput()->with('error', 'Gagal memperbarui review.');
-        }
+        return view('admin.reviews.show', compact('review'));
     }
 
     public function destroy(Review $review)
@@ -84,21 +71,22 @@ class ReviewController extends Controller
         }
     }
 
-    public function stats()
+    // Tampilkan kembali review yang disembunyikan
+    public function unhide(Review $review)
     {
-        $total         = Review::count();
-        $averageRating = round(Review::avg('rating'), 2);
-        $breakdown     = [];
-        for ($i = 5; $i >= 1; $i--) {
-            $breakdown[$i] = Review::where('rating', $i)->count();
-        }
-        $trashed = Review::onlyTrashed()->count();
+        try {
+            $review->is_hidden      = false;
+            $review->reports_count  = 0;
+            $review->report_reasons = null;
+            $review->save();
 
-        return view('admin.reviews.stats', compact(
-            'total',
-            'averageRating',
-            'breakdown',
-            'trashed'
-        ));
+            return back()->with('success', 'Review ditampilkan kembali.');
+        } catch (\Exception $e) {
+            Log::error('ReviewController::unhide failed', [
+                'id'    => $review->id,
+                'error' => $e->getMessage(),
+            ]);
+            return back()->with('error', 'Gagal menampilkan review.');
+        }
     }
 }

@@ -1,31 +1,14 @@
 @extends('layouts.public')
-@section('title', 'Galeri — Pantai Pasir Putih Toba')
+@section('title', 'Galeri — Pasir Putih Parparean')
 @section('content')
 
 <section class="page-hero">
-    <div class="page-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80')"></div>
+    <div class="page-hero-bg" style="background-image:url('https://www.switour.com/wp-content/uploads/2022/08/Pantai-Pasir-Putih-Parparean-3-1024x541.jpeg')"></div>
     <div class="page-hero-overlay"></div>
     <div class="page-hero-content reveal">
         <div class="section-label" style="justify-content:center;color:var(--gold)">Galeri</div>
         <h1>Keindahan yang <em>Tak Terlupakan</em></h1>
-        <p>Koleksi foto dan video destinasi wisata kami</p>
-    </div>
-</section>
-
-{{-- FILTER --}}
-<section style="padding:40px 0 20px">
-    <div class="container">
-        <div class="filter-tabs">
-            <a href="{{ route('public.gallery') }}" class="filter-tab {{ $type === 'all' ? 'active' : '' }}">
-                <i class="fas fa-th"></i> Semua
-            </a>
-            <a href="{{ route('public.gallery', ['type' => 'photo']) }}" class="filter-tab {{ $type === 'photo' ? 'active' : '' }}">
-                <i class="fas fa-image"></i> Foto
-            </a>
-            <a href="{{ route('public.gallery', ['type' => 'video']) }}" class="filter-tab {{ $type === 'video' ? 'active' : '' }}">
-                <i class="fas fa-video"></i> Video
-            </a>
-        </div>
+        <p>Koleksi foto destinasi wisata kami</p>
     </div>
 </section>
 
@@ -35,23 +18,13 @@
         @forelse($galleries as $gallery)
         @if($loop->first)<div class="gallery-masonry">@endif
 
-        <div class="gallery-item reveal" onclick="openLightbox('{{ asset('storage/'.$gallery->file_path) }}','{{ $gallery->type }}','{{ addslashes($gallery->title ?? '') }}')">
-            @if($gallery->type === 'video')
-                <div class="gallery-item-inner video-thumb">
-                    <div class="play-btn"><i class="fas fa-play"></i></div>
-                    <div class="gallery-overlay">
-                        <span class="gallery-type-badge"><i class="fas fa-video"></i> Video</span>
-                        @if($gallery->title)<p>{{ $gallery->title }}</p>@endif
-                    </div>
+        <div class="gallery-item reveal" onclick="openLightbox('{{ asset('storage/'.$gallery->file_path) }}','{{ addslashes($gallery->title ?? '') }}')">
+            <div class="gallery-item-inner" style="background-image:url('{{ asset('storage/'.$gallery->file_path) }}')">
+                <div class="gallery-overlay">
+                    <i class="fas fa-expand"></i>
+                    @if($gallery->title)<p>{{ $gallery->title }}</p>@endif
                 </div>
-            @else
-                <div class="gallery-item-inner" style="background-image:url('{{ asset('storage/'.$gallery->file_path) }}')">
-                    <div class="gallery-overlay">
-                        <i class="fas fa-expand"></i>
-                        @if($gallery->title)<p>{{ $gallery->title }}</p>@endif
-                    </div>
-                </div>
-            @endif
+            </div>
         </div>
 
         @if($loop->last)</div>@endif
@@ -62,7 +35,7 @@
         {{-- PAGINATION --}}
         @if($galleries->hasPages())
         <div style="margin-top:48px;display:flex;justify-content:center">
-            {{ $galleries->appends(['type' => $type])->links() }}
+            {{ $galleries->links() }}
         </div>
         @endif
     </div>
@@ -96,9 +69,6 @@
 .gallery-overlay{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.7),transparent);display:flex;flex-direction:column;justify-content:flex-end;padding:16px;opacity:0;transition:opacity .3s;color:#fff}
 .gallery-item:hover .gallery-overlay{opacity:1}
 .gallery-overlay p{margin:4px 0 0;font-size:.9rem}
-.gallery-type-badge{font-size:.75rem;background:rgba(255,255,255,.2);padding:3px 10px;border-radius:50px;align-self:flex-start}
-.video-thumb{background:linear-gradient(135deg,#0a1628,#0e3a5c);display:flex;align-items:center;justify-content:center}
-.play-btn{width:60px;height:60px;background:rgba(255,255,255,.15);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.4rem;color:#fff;backdrop-filter:blur(4px);position:absolute}
 .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.95);z-index:1000;align-items:center;justify-content:center}
 .lightbox.open{display:flex}
 .lightbox-close{position:absolute;top:20px;right:20px;background:none;border:none;color:#fff;font-size:1.5rem;cursor:pointer}
@@ -110,23 +80,18 @@
 </style>
 
 <script>
-function openLightbox(src, type, title) {
-    const lb    = document.getElementById('lightbox');
-    const img   = document.getElementById('lightbox-img');
-    const video = document.getElementById('lightbox-video');
-    const cap   = document.getElementById('lightbox-caption');
-    if (type === 'video') {
-        video.src = src; img.style.display = 'none'; video.style.display = 'block';
-    } else {
-        img.src = src; img.style.display = 'block'; video.style.display = 'none';
-    }
+function openLightbox(src, title) {
+    const lb  = document.getElementById('lightbox');
+    const img = document.getElementById('lightbox-img');
+    const cap = document.getElementById('lightbox-caption');
+    img.src = src;
+    img.style.display = 'block';
     cap.textContent = title;
     lb.classList.add('open');
     document.body.style.overflow = 'hidden';
 }
 function closeLightbox() {
     document.getElementById('lightbox').classList.remove('open');
-    document.getElementById('lightbox-video').pause();
     document.body.style.overflow = '';
 }
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeLightbox(); });

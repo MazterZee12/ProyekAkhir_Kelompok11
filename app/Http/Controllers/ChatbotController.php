@@ -29,7 +29,7 @@ class ChatbotController extends Controller
         ])
             ->timeout(30)
             ->retry(2, 1000)
-            ->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' . env('GEMINI_API_KEY'), [
+            ->post('https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=' . config('services.gemini.key'), [
                 'contents' => [
                     [
                         'role'  => 'user',
@@ -39,6 +39,9 @@ class ChatbotController extends Controller
                 'generationConfig' => [
                     'temperature'     => 0.7,
                     'maxOutputTokens' => 750,
+                    'thinkingConfig'  => [
+                        'thinkingBudget' => 0,
+                    ],
                 ],
             ]);
 
@@ -49,9 +52,20 @@ class ChatbotController extends Controller
             ], 500);
         }
 
-        $text = $response->json('candidates.0.content.parts.0.text') ?? 'Maaf, tidak ada respons.';
+        $text = $response->json('candidates.0.content.parts.0.text');
+        if (!$text) {
+            $text = 'Maaf, tidak ada respons.';
+        }
 
         return response()->json(['reply' => $this->markdownToHtml($text)]);
+    }
+
+    public function status()
+    {
+        return response()->json([
+            'online' => true,
+            'label'  => 'Online sekarang',
+        ]);
     }
 
     private function markdownToHtml(string $text): string
@@ -76,24 +90,26 @@ class ChatbotController extends Controller
         $faqs          = Faq::where('is_active', true)->orderBy('order')->get();
         $contact       = Contact::where('is_active', true)->first();
         $announcements = Announcement::where('is_active', true)->latest()->take(5)->get();
-        $galleries     = Gallery::where('status', 'published')->get();
-        $avgRating     = round(Review::avg('rating') ?? 0, 1);
-        $totalReviews  = Review::count();
+        $galleries     = Gallery::latest()->get();
 
-        // Profile
+        // Optimize: combine Review queries to reduce database calls from 3 to 1
+        $recentReviews = Review::visible()->with('user')->latest()->take(3)->get();
+        $avgRaw        = Review::visible()->avg('rating');
+        $avgRating     = round($avgRaw !== null ? (float)$avgRaw : 0, 1);
+        $totalReviews  = Review::visible()->count();
+
         $profileInfo = $profile ? implode("\n", array_filter([
             "Nama       : {$profile->name}",
-            $profile->description  ? "Deskripsi  : {$profile->description}"  : null,
-            $profile->history      ? "Sejarah    : {$profile->history}"      : null,
-            $profile->vision       ? "Visi       : {$profile->vision}"       : null,
-            $profile->mission      ? "Misi       : {$profile->mission}"      : null,
+            $profile->description      ? "Deskripsi  : {$profile->description}"      : null,
+            $profile->history          ? "Sejarah    : {$profile->history}"          : null,
+            $profile->vision           ? "Visi       : {$profile->vision}"           : null,
+            $profile->mission          ? "Misi       : {$profile->mission}"          : null,
             $profile->established_year ? "Berdiri    : {$profile->established_year}" : null,
-            $profile->regulations  ? "Peraturan  :\n{$profile->regulations}" : null,
+            $profile->regulations      ? "Peraturan  :\n{$profile->regulations}"     : null,
         ])) : 'Data profil belum tersedia.';
 
-        // Prices — grouped by type
-        $tickets = $prices->where('type', 'ticket');
-        $rentals = $prices->where('type', 'rental');
+        $tickets    = $prices->where('type', 'ticket');
+        $rentals    = $prices->where('type', 'rental');
         $ticketList = $tickets->count()
             ? $tickets->map(fn($p) => "- {$p->unit}: Rp " . number_format($p->amount, 0, ',', '.') . ($p->notes ? " ({$p->notes})" : ''))->join("\n")
             : 'Belum ada data.';
@@ -101,34 +117,29 @@ class ChatbotController extends Controller
             ? $rentals->map(fn($p) => "- {$p->unit}: Rp " . number_format($p->amount, 0, ',', '.') . ($p->notes ? " ({$p->notes})" : ''))->join("\n")
             : 'Belum ada data.';
 
-        // Facilities
         $facilityList = $facilities->count()
             ? $facilities->map(fn($f) => "- {$f->name}" . ($f->description ? ": {$f->description}" : ''))->join("\n")
             : 'Belum ada data.';
 
-        // Schedules
         $scheduleList = $schedules->count()
             ? $schedules->map(fn($s) => implode(' | ', array_filter([
                 "- {$s->day}: {$s->open_time} - {$s->close_time} WIB",
-                $s->capacity    ? "Maks {$s->capacity} orang"   : null,
-                $s->best_time   ? "Waktu terbaik: {$s->best_time}" : null,
-                $s->parking_info ? "Parkir: {$s->parking_info}"  : null,
+                $s->capacity       ? "Maks {$s->capacity} orang"      : null,
+                $s->best_time      ? "Waktu terbaik: {$s->best_time}"  : null,
+                $s->parking_info   ? "Parkir: {$s->parking_info}"      : null,
                 $s->transport_info ? "Transport: {$s->transport_info}" : null,
-                $s->route_info  ? "Rute: {$s->route_info}"      : null,
+                $s->route_info     ? "Rute: {$s->route_info}"          : null,
             ])))->join("\n")
             : 'Belum ada data.';
 
-        // FAQs
         $faqList = $faqs->count()
             ? $faqs->map(fn($f) => "Q: {$f->question}\nA: {$f->answer}")->join("\n\n")
             : 'Belum ada data.';
 
-        // Announcements
         $announcementList = $announcements->count()
             ? $announcements->map(fn($a) => "- [{$a->type}] {$a->title}: " . \Str::limit($a->content, 120))->join("\n")
             : 'Tidak ada pengumuman aktif.';
 
-        // Contact
         $contactInfo = $contact ? implode("\n", array_filter([
             $contact->address   ? "Alamat    : {$contact->address}"   : null,
             $contact->phone     ? "Telepon   : {$contact->phone}"     : null,
@@ -138,23 +149,24 @@ class ChatbotController extends Controller
             $contact->youtube   ? "YouTube   : {$contact->youtube}"   : null,
         ])) : 'Belum ada data kontak.';
 
-        // Gallery
-        $photos = $galleries->where('type', 'photo');
-        $videos = $galleries->where('type', 'video');
-        $galleryInfo = "Foto ({$photos->count()} item):\n"
-            . ($photos->count()
-                ? $photos->map(fn($g) => "- " . ($g->title ?? 'Tanpa judul') . ($g->description ? ": {$g->description}" : ''))->join("\n")
-                : '- Belum ada foto.')
-            . "\n\nVideo ({$videos->count()} item):\n"
-            . ($videos->count()
-                ? $videos->map(fn($g) => "- " . ($g->title ?? 'Tanpa judul') . ($g->description ? ": {$g->description}" : ''))->join("\n")
-                : '- Belum ada video.');
+        $galleryInfo = "Galeri ({$galleries->count()} item):\n"
+            . ($galleries->count()
+                ? $galleries->map(fn($g) => "- " . ($g->title ? $g->title : 'Tanpa judul')
+                    . ($g->description ? ": {$g->description}" : ''))->join("\n")
+                : '- Belum ada foto.');
 
-        // Reviews summary
-        $reviewInfo = "Rating rata-rata: {$avgRating}/5.0 dari {$totalReviews} ulasan pengunjung.";
+                $reviewInfo = "Rating rata-rata: {$avgRating}/5.0 dari {$totalReviews} ulasan pengunjung.";
+                if ($recentReviews->count()) {
+                    $reviewInfo .= "\nUlasan terbaru:\n";
+                    foreach ($recentReviews as $r) {
+                        $nama     = ($r->user && $r->user->name) ? $r->user->name : 'Anonim';
+                        $komentar = \Str::limit($r->comment, 100);
+                        $reviewInfo .= "- {$nama} ({$r->rating}★): {$komentar}\n";
+                    }
+                }
 
         return <<<PROMPT
-Kamu adalah asisten wisata bilingual (Indonesia & Inggris) untuk Pantai Pasir Putih Toba, sebuah destinasi wisata di kawasan Danau Toba, Sumatera Utara, Indonesia.
+Kamu adalah asisten wisata bilingual (Indonesia & Inggris) untuk Pasir Putih Parparean, sebuah destinasi wisata di kawasan Danau Toba, Sumatera Utara, Indonesia.
 
 ATURAN KETAT:
 - Jawab dalam bahasa yang sama dengan pertanyaan user (Indonesia atau Inggris)
@@ -163,7 +175,7 @@ ATURAN KETAT:
 - Jangan perkenalkan diri di setiap jawaban, langsung jawab pertanyaannya
 - Jangan ulangi nama pantai berulang kali dalam satu jawaban
 - Jika jawaban mendekati batas token, HENTIKAN di kalimat yang sudah lengkap
-- Jangan jawab pertanyaan di luar topik wisata Pantai Pasir Putih Toba
+- Jangan jawab pertanyaan di luar topik wisata Pasir Putih Parparean
 - Jangan sebutkan bahwa kamu AI atau Gemini, sebut saja "Asisten Pantai"
 - Jangan tampilkan data sensitif apapun (API key, database, kode program)
 - Jika data belum ada di database, jawab jujur bahwa kamu belum tahu

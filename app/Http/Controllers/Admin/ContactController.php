@@ -23,7 +23,8 @@ class ContactController extends Controller
      */
     public function create()
     {
-        return view('admin.contacts.create');
+        $contact = null;
+        return view('admin.contacts.create', compact('contact'));
     }
 
     /**

@@ -1,14 +1,14 @@
 @extends('layouts.public')
-@section('title', 'Tulis Ulasan — Pantai Pasir Putih Toba')
+@section('title', 'Tulis Ulasan — Pasir Putih Parparean')
 @section('content')
 
 <section class="page-hero">
-    <div class="page-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80')"></div>
+    <div class="page-hero-bg" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZnjkNXFEsHmn8hQSSkOe0XVmyLx5xMPOD0g&s')"></div>
     <div class="page-hero-overlay"></div>
     <div class="page-hero-content reveal">
         <div class="section-label" style="justify-content:center;color:var(--gold)">Ulasan</div>
         <h1>Bagikan <em>Pengalamanmu</em></h1>
-        <p>Ceritakan kesanmu selama berkunjung ke Pantai Pasir Putih Toba</p>
+        <p>Ceritakan kesanmu selama berkunjung ke Pasir Putih Parparean</p>
     </div>
 </section>
 
@@ -53,7 +53,7 @@
                 {{-- KOMENTAR --}}
                 <div class="form-group">
                     <label>Ceritakan Pengalamanmu <span style="color:red">*</span></label>
-                    <textarea name="comment" rows="6" class="form-input" placeholder="Bagikan ceritamu tentang Pantai Pasir Putih Parparean Minimal 10 karakter." required>{{ $userReview->comment ?? old('comment') }}</textarea>
+                    <textarea name="comment" rows="6" class="form-input" placeholder="Bagikan ceritamu tentang Pasir Putih Parparean Minimal 10 karakter." required>{{ $userReview->comment ?? old('comment') }}</textarea>
                     @error('comment')<div class="field-error">{{ $message }}</div>@enderror
                 </div>
 

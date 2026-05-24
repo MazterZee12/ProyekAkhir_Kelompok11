@@ -1,14 +1,14 @@
 @extends('layouts.public')
-@section('title', 'Pengumuman — Pantai Pasir Putih Toba')
+@section('title', 'Pengumuman — Pasir Putih Parparean')
 @section('content')
 
 <section class="page-hero">
-    <div class="page-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1471922694854-ff1b63b20054?w=1600&q=80')"></div>
+    <div class="page-hero-bg" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSsQdIItsc2V-IXOOR4JPvrlK-lanNRvH9b6A&s')"></div>
     <div class="page-hero-overlay"></div>
     <div class="page-hero-content reveal">
         <div class="section-label" style="justify-content:center;color:var(--gold)">Pengumuman</div>
         <h1>Berita & <em>Event Terkini</em></h1>
-        <p>Informasi terbaru seputar kawasan wisata Pantai Pasir Putih Toba</p>
+        <p>Informasi terbaru seputar kawasan wisata Pasir Putih Parparean</p>
     </div>
 </section>
 
@@ -29,7 +29,7 @@
         @forelse($announcements as $announcement)
         @if($loop->first)<div class="ann-grid">@endif
 
-        <a href="{{ route('public.announcements.show', $announcement->slug) }}" class="ann-card reveal">
+        <a href="{{ route('public.announcements.show', $announcement) }}" class="ann-card reveal">
             <div class="ann-img">
                 @if($announcement->photo_path)
                     <img src="{{ asset('storage/'.$announcement->photo_path) }}" alt="{{ $announcement->title }}">

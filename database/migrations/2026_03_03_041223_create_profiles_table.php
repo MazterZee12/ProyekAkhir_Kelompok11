@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('mission')->nullable();
             $table->year('established_year')->nullable();
             $table->text('regulations')->nullable();
-            $table->string('logo_path')->nullable();
+            $table->string('photo_path')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });

@@ -8,6 +8,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+    @stack('styles')
 </head>
 <body class="theme-purple">
 
@@ -167,9 +168,22 @@
         <div class="sidebar-section-label">Pengguna</div>
         <ul class="nav flex-column">
             <li class="nav-item">
-                <a href="{{ route('admin.reviews.index') }}" class="nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
+                @php
+                    $reportedCount = \App\Models\Review::where('reports_count', '>=', 5)
+                        ->where('is_hidden', false)
+                        ->count();
+                @endphp
+                <a href="{{ route('admin.reviews.index') }}"
+                    class="nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
                     <i class="fas fa-star"></i>
-                    <span class="nav-text">Ulasan</span>
+                    <span class="nav-text d-flex align-items-center gap-2">
+                        Ulasan
+                        @if($reportedCount > 0)
+                            <span class="badge bg-danger" style="font-size:0.6rem;padding:3px 6px;">
+                                {{ $reportedCount }}
+                            </span>
+                        @endif
+                    </span>
                 </a>
             </li>
         </ul>

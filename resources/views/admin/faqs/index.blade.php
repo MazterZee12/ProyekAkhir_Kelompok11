@@ -15,7 +15,7 @@
                     <tr>
                         <th width="60">#</th>
                         <th>Question</th>
-                        <th width="80">Order</th>
+                        <th width="70">Order</th>
                         <th width="80">Status</th>
                         <th width="220">Action</th>
                     </tr>
@@ -34,13 +34,13 @@
                             @endif
                         </td>
                         <td class="d-flex gap-1">
-                            <a href="{{ route('admin.faqs.show', $faq->id) }}" class="btn btn-sm btn-info">View</a>
+                            <a href="{{ route('admin.faqs.show', $faq->id) }}" class="btn btn-sm btn-info">Lihat</a>
                             <a href="{{ route('admin.faqs.edit', $faq->id) }}" class="btn btn-sm btn-warning">Edit</a>
                             <form action="{{ route('admin.faqs.destroy', $faq->id) }}" method="POST"
                                 onsubmit="return confirm('Delete this FAQ?')">
                                 @csrf
                                 @method('DELETE')
-                                <button class="btn btn-sm btn-danger">Delete</button>
+                                <button class="btn btn-sm btn-danger">Hapus</button>
                             </form>
                         </td>
                     </tr>

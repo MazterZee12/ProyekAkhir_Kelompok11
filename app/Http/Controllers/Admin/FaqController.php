@@ -23,7 +23,8 @@ class FaqController extends Controller
      */
     public function create()
     {
-        return view('admin.faqs.create');
+        $faq = null;
+        return view('admin.faqs.create', compact('faq'));
     }
 
     /**

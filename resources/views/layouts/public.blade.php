@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Pantai Pasir Putih Toba')</title>
+    <title>@yield('title', 'Pasir Putih Parparean')</title>
     <meta name="description" content="@yield('description', 'Destinasi wisata pantai terbaik di kawasan Danau Toba, Sumatera Utara.')">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
@@ -140,7 +140,7 @@
     </div>
 
     <div class="footer-bottom">
-        <p>© {{ date('Y') }} Pantai Pasir Putih Toba. All rights reserved.</p>
+        <p>© {{ date('Y') }} Pasir Putih Parparean. All rights reserved.</p>
         <a href="{{ url('/contact') }}">Hubungi Kami</a>
     </div>
 </footer>
