@@ -1,4 +1,7 @@
-// ===== CHATBOT WIDGET =====
+// ===================================================
+// chatbot.js — Pasir Putih Parparean
+// ===================================================
+
 const chatToggle   = document.getElementById('chatToggle');
 const chatPopup    = document.getElementById('chatPopup');
 const chatClose    = document.getElementById('chatClose');
@@ -8,10 +11,11 @@ const chatMessages = document.getElementById('chatMessages');
 const chatTyping   = document.getElementById('chatTyping');
 const chatBadge    = document.getElementById('chatBadge');
 const quickReplies = document.getElementById('quickReplies');
-const statusText   = document.querySelector('.chat-header-status');
+const statusEl     = document.querySelector('.chat-header-status');
+
 let isOpen = false;
 
-// Toggle open/close
+// ── Open / Close ──
 function toggleChat() {
     isOpen = !isOpen;
     chatToggle.classList.toggle('open', isOpen);
@@ -19,18 +23,24 @@ function toggleChat() {
     if (isOpen) {
         chatBadge.classList.add('hidden');
         chatInput.focus();
+        scrollBottom();
     }
 }
 chatToggle.addEventListener('click', toggleChat);
 chatClose.addEventListener('click', toggleChat);
 
-// Enable/disable send button
+// Close on outside click
+document.addEventListener('click', e => {
+    if (isOpen && !document.getElementById('chatWidget').contains(e.target)) {
+        toggleChat();
+    }
+});
+
+// ── Input ──
 chatInput.addEventListener('input', () => {
     chatSend.disabled = chatInput.value.trim() === '';
 });
-
-// Send on Enter
-chatInput.addEventListener('keydown', (e) => {
+chatInput.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey && chatInput.value.trim()) {
         e.preventDefault();
         sendMessage(chatInput.value.trim());
@@ -40,7 +50,7 @@ chatSend.addEventListener('click', () => {
     if (chatInput.value.trim()) sendMessage(chatInput.value.trim());
 });
 
-// Quick reply buttons
+// ── Quick Replies ──
 document.querySelectorAll('.chat-quick-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         sendMessage(btn.dataset.msg);
@@ -48,25 +58,27 @@ document.querySelectorAll('.chat-quick-btn').forEach(btn => {
     });
 });
 
+// ── Status ──
 function setStatus(state, label = '') {
-    const dots = {
-        online  : '<span class="chat-status-dot"></span>',
-        typing  : '<span class="chat-status-dot typing"></span>',
-        offline : '<span class="chat-status-dot offline"></span>',
+    const dotClass = {
+        online  : 'chat-status-dot',
+        typing  : 'chat-status-dot typing',
+        offline : 'chat-status-dot offline',
     };
-    const labels = {
+    const text = {
         online  : label || 'Online sekarang',
         typing  : 'Sedang mengetik...',
         offline : label || 'Sedang tidak tersedia',
     };
-    statusText.innerHTML = `${dots[state]} ${labels[state]}`;
+    statusEl.innerHTML =
+        `<span class="${dotClass[state]}"></span>${text[state]}`;
 }
 
 async function checkAiStatus() {
     try {
         const res  = await fetch('/chatbot/status');
         const data = await res.json();
-        setStatus(data.online ? 'online' : 'offline', data.label);
+        setStatus(data.online ? 'online' : 'offline', data.label ?? '');
     } catch {
         setStatus('offline', 'Koneksi bermasalah');
     }
@@ -74,47 +86,52 @@ async function checkAiStatus() {
 checkAiStatus();
 setInterval(checkAiStatus, 30_000);
 
-window.addEventListener('offline', () => {
-    setStatus('offline', 'Tidak ada koneksi');
-});
-window.addEventListener('online', () => {
-    checkAiStatus();
-});
+window.addEventListener('offline', () => setStatus('offline', 'Tidak ada koneksi'));
+window.addEventListener('online',  () => checkAiStatus());
+
+// ── Messages ──
+function escHtml(str) {
+    return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/\n/g, '<br>');
+}
+
+function scrollBottom() {
+    setTimeout(() => { chatMessages.scrollTop = chatMessages.scrollHeight; }, 40);
+}
 
 function addMessage(text, isUser = false) {
     const msg = document.createElement('div');
     msg.className = `chat-msg ${isUser ? 'chat-msg-user' : 'chat-msg-bot'}`;
-    if (!isUser) {
-        msg.innerHTML = `
-            <div class="chat-msg-avatar"><i class="fas fa-umbrella-beach"></i></div>
-            <div class="chat-msg-bubble">${text}</div>
-        `;
-    } else {
-        msg.innerHTML = `<div class="chat-msg-bubble">${text}</div>`;
-    }
+    msg.innerHTML = isUser
+        ? `<div class="chat-msg-bubble">${escHtml(text)}</div>`
+        : `<div class="chat-msg-avatar"><i class="fas fa-umbrella-beach"></i></div>
+           <div class="chat-msg-bubble">${text}</div>`;
     chatMessages.appendChild(msg);
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    scrollBottom();
 }
 
 function showTyping() {
     chatTyping.classList.add('show');
     setStatus('typing');
-    chatMessages.scrollTop = chatMessages.scrollHeight;
+    scrollBottom();
 }
-
 function hideTyping() {
     chatTyping.classList.remove('show');
     setStatus('online');
 }
 
+// ── Send ──
 async function sendMessage(text) {
     if (!text.trim()) return;
+
     addMessage(text, true);
-    chatInput.value = '';
+    chatInput.value   = '';
     chatSend.disabled = true;
     showTyping();
 
-    // Cek koneksi browser dulu
     if (!navigator.onLine) {
         hideTyping();
         addMessage('⚠️ Tidak ada koneksi internet. Periksa jaringan kamu ya!');
@@ -128,37 +145,37 @@ async function sendMessage(text) {
     while (attempt <= MAX_RETRY) {
         try {
             const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 15000);
+            const timeout    = setTimeout(() => controller.abort(), 15_000);
 
-            const response = await fetch('/chatbot', {
+            const res = await fetch('/chatbot', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    'Accept':       'application/json',
                     'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
                 },
-                body: JSON.stringify({ message: text }),
+                body:   JSON.stringify({ message: text }),
                 signal: controller.signal,
             });
 
             clearTimeout(timeout);
-            const data = await response.json();
+            const data = await res.json();
             hideTyping();
             addMessage(data.reply || 'Maaf, tidak ada respons.');
+            chatSend.disabled = false;
             return;
 
         } catch (err) {
             attempt++;
-
             if (attempt > MAX_RETRY) {
                 hideTyping();
-                if (err.name === 'AbortError') {
-                    addMessage('⏱️ Koneksi terlalu lama. Coba lagi nanti ya!');
-                } else {
-                    addMessage('❌ Gagal terhubung ke server. Pastikan internet kamu stabil.');
-                }
+                addMessage(
+                    err.name === 'AbortError'
+                        ? '⏱️ Koneksi terlalu lama. Coba lagi nanti ya!'
+                        : '❌ Gagal terhubung ke server. Pastikan internet kamu stabil.'
+                );
                 chatSend.disabled = false;
             } else {
-                // Tunggu sebelum retry (1 detik, 2 detik)
                 await new Promise(r => setTimeout(r, attempt * 1000));
             }
         }

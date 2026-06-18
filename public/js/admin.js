@@ -65,3 +65,28 @@ document.addEventListener('click', function () {
 themePalette.addEventListener('click', function (e) {
     e.stopPropagation();
 });
+
+// ===== INFORMATION REQUEST: search auto-submit (debounced) =====
+(function () {
+    const searchInput = document.getElementById('irSearchInput');
+    if (!searchInput) return;
+    let debounceTimer;
+    searchInput.addEventListener('input', function () {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => this.form.submit(), 500);
+    });
+})();
+
+// ===== INFORMATION REQUEST: status select submits its own form =====
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.ir-status-select').forEach(select => {
+        select.addEventListener('change', function () {
+            const label = this.options[this.selectedIndex].text;
+            if (confirm('Ubah status permintaan menjadi "' + label + '"?')) {
+                this.form.submit();
+            } else {
+                this.value = this.dataset.current;
+            }
+        });
+    });
+});

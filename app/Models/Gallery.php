@@ -3,19 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Gallery extends Model
 {
     protected $fillable = [
         'title',
         'description',
-        'file_path',
-        'type'
+        'media_id',
     ];
 
-    public function getFileUrlAttribute()
+    public function media(): BelongsTo
     {
-        return asset('storage/' . $this->file_path);
+        return $this->belongsTo(Media::class);
     }
 }

@@ -2,11 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Contact extends Model
+class Contact extends BaseModel
 {
-        protected $fillable = [
+    protected $fillable = [
         'address',
         'email',
         'phone',
@@ -15,10 +13,10 @@ class Contact extends Model
         'facebook',
         'youtube',
         'twitter',
-        'is_active'
+        'is_active',
     ];
 
     protected $casts = [
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
     ];
 }

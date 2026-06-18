@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+
 @section('content')
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -8,11 +9,15 @@
             <a href="{{ route('admin.banners.index') }}" class="btn btn-secondary">Back</a>
         </div>
     </div>
+
     <div class="card">
         <div class="card-body">
             <div class="mb-4">
-                <img src="{{ asset('storage/'.$banner->image_path) }}" width="300" class="img-thumbnail">
+                @if($banner->media)
+                    <img src="{{ $banner->media->url }}" width="300" class="img-thumbnail">
+                @endif
             </div>
+
             <table class="table table-bordered">
                 <tr>
                     <th width="200">Title</th>
@@ -21,16 +26,6 @@
                 <tr>
                     <th>Subtitle</th>
                     <td>{{ $banner->subtitle ?? '-' }}</td>
-                </tr>
-                <tr>
-                    <th>URL</th>
-                    <td>
-                        @if($banner->url)
-                            <a href="{{ $banner->url }}" target="_blank">{{ $banner->url }}</a>
-                        @else
-                            -
-                        @endif
-                    </td>
                 </tr>
                 <tr>
                     <th>Order</th>

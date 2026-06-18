@@ -39,6 +39,7 @@ class ContactController extends Controller
             'google_maps_embed' => 'nullable|string',
             'instagram'         => 'nullable|string|max:255',
             'facebook'          => 'nullable|string|max:255',
+            'youtube'           => 'nullable|string|max:255',
             'twitter'           => 'nullable|string|max:255',
             'is_active'         => 'nullable|boolean',
         ]);
@@ -51,11 +52,9 @@ class ContactController extends Controller
 
         try {
             Contact::create($data);
-
             return redirect()
                 ->route('admin.contacts.index')
                 ->with('success', 'Contact created.');
-
         } catch (\Exception $e) {
             Log::error('ContactController::store failed', [
                 'error' => $e->getMessage()
@@ -103,11 +102,9 @@ class ContactController extends Controller
 
         try {
             $contact->update($data);
-
             return redirect()
                 ->route('admin.contacts.index')
                 ->with('success', 'Contact updated.');
-
         } catch (\Exception $e) {
             Log::error('ContactController::update failed', [
                 'id'    => $contact->id,
@@ -124,11 +121,9 @@ class ContactController extends Controller
     {
         try {
             $contact->delete();
-
             return redirect()
                 ->route('admin.contacts.index')
                 ->with('success', 'Contact deleted.');
-
         } catch (\Exception $e) {
             Log::error('ContactController::destroy failed', [
                 'id'    => $contact->id,

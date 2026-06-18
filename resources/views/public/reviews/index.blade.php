@@ -8,11 +8,12 @@
 
 @section('content')
 
-{{-- PAGE HEADER --}}
-<section class="page-header">
-    <div class="page-header-bg"></div>
-    <div class="page-header-content">
-        <div class="hero-eyebrow">Pengunjung Kami</div>
+{{-- PAGE HERO --}}
+<section class="page-hero">
+    <div class="page-hero-bg" style="background-image:url('https://tobaria.com/wp-content/uploads/2021/04/IMG_20210415_144408-1024x576.jpg')"></div>
+    <div class="page-hero-overlay"></div>
+    <div class="page-hero-content reveal">
+        <div class="section-label" style="justify-content:center">Pengunjung Kami</div>
         <h1>Ulasan & <em>Testimoni</em></h1>
         <p>Cerita nyata dari para wisatawan yang telah merasakan keindahan Pasir Putih Parparean.</p>
     </div>
@@ -91,7 +92,7 @@
                                 onsubmit="return confirm('Hapus ulasan kamu?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn-report" style="color:#ef4444; border-color:#ef4444;">
+                                <button type="submit" class="btn-report" style="color:#e05252;">
                                     <i class="fas fa-trash"></i> Hapus
                                 </button>
                             </form>
@@ -125,81 +126,51 @@
 
 {{-- Modal Laporan --}}
 @auth
-<div id="reportModal"
-    style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:9999;align-items:center;justify-content:center;">
-    <div style="background:#1e293b;border:1px solid rgba(255,255,255,0.1);border-radius:16px;padding:32px;max-width:420px;width:90%;color:#f1f5f9;">
-        <h5 style="margin:0 0 8px;font-size:1.1rem;color:#f1f5f9;">Laporkan Ulasan</h5>
-        <p style="font-size:0.85rem;color:#94a3b8;margin-bottom:24px;line-height:1.6;">
-            Pilih alasan pelaporan. Ulasan akan otomatis disembunyikan jika mendapat 5 laporan.
-        </p>
+<div id="reportModal" class="report-modal">
+    <div class="report-modal-card">
+        <div class="report-modal-header">
+            <h5>Laporkan Ulasan</h5>
+            <button type="button" class="report-modal-close" onclick="closeReportModal()" aria-label="Tutup">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <p class="report-modal-desc">Pilih alasan pelaporan. Ulasan akan otomatis disembunyikan jika mendapat 5 laporan.</p>
+
         <form id="reportForm" method="POST">
             @csrf
-            <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:20px;">
-
-                <label style="display:flex;align-items:center;gap:12px;cursor:pointer;color:#f1f5f9;font-size:0.9rem;">
-                    <input type="radio" name="reason" value="spam" onchange="onReasonChange(this)">
-                    Spam
+            <div class="report-options">
+                <label class="report-option">
+                    <input type="radio" name="reason" value="spam" onchange="onReasonChange(this)"> Spam
                 </label>
-
-                <label style="display:flex;align-items:center;gap:12px;cursor:pointer;color:#f1f5f9;font-size:0.9rem;">
-                    <input type="radio" name="reason" value="kata_kasar" onchange="onReasonChange(this)">
-                    Kata Kasar
+                <label class="report-option">
+                    <input type="radio" name="reason" value="kata_kasar" onchange="onReasonChange(this)"> Kata Kasar
                 </label>
-
-                <label style="display:flex;align-items:center;gap:12px;cursor:pointer;color:#f1f5f9;font-size:0.9rem;">
-                    <input type="radio" name="reason" value="tidak_relevan" onchange="onReasonChange(this)">
-                    Tidak Relevan
+                <label class="report-option">
+                    <input type="radio" name="reason" value="tidak_relevan" onchange="onReasonChange(this)"> Tidak Relevan
                 </label>
-
-                <label style="display:flex;align-items:center;gap:12px;cursor:pointer;color:#f1f5f9;font-size:0.9rem;">
-                    <input type="radio" name="reason" value="lainnya" onchange="onReasonChange(this)">
-                    Lainnya
+                <label class="report-option">
+                    <input type="radio" name="reason" value="lainnya" onchange="onReasonChange(this)"> Lainnya
                 </label>
-
             </div>
 
-            {{-- Textbox opsional — muncul saat pilih Lainnya --}}
-            <div id="noteBox" style="display:none;margin-bottom:20px;">
-                <textarea name="note" rows="3"
-                    placeholder="Jelaskan lebih lanjut (opsional)..."
-                    style="width:100%;background:#0f172a;border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:12px;color:#f1f5f9;font-size:0.875rem;font-family:inherit;resize:none;box-sizing:border-box;">
-                </textarea>
+            <div id="noteBox" class="report-note-box">
+                <textarea name="note" rows="3" class="report-textarea"
+                    placeholder="Jelaskan lebih lanjut (opsional)..."></textarea>
             </div>
 
-            <div style="display:flex;gap:10px;justify-content:flex-end;">
-                <button type="button" onclick="closeReportModal()" class="btn-outline-hero">Batal</button>
-                <button type="submit" class="btn-primary-hero">
+            <div class="report-modal-actions">
+                <button type="button" onclick="closeReportModal()" class="btn-outline-hero form-btn">Batal</button>
+                <button type="submit" class="btn-primary-hero form-btn">
                     <i class="fas fa-flag"></i> Kirim Laporan
                 </button>
             </div>
         </form>
     </div>
 </div>
-
-<script>
-function openReportModal(reviewId) {
-    const modal = document.getElementById('reportModal');
-    const form  = document.getElementById('reportForm');
-    form.action = '/reviews/' + reviewId + '/report';
-    document.querySelectorAll('#reportForm input[type=radio]').forEach(r => r.checked = false);
-    document.getElementById('noteBox').style.display = 'none';
-    modal.style.display = 'flex';
-}
-
-function closeReportModal() {
-    document.getElementById('reportModal').style.display = 'none';
-}
-
-function onReasonChange(radio) {
-    const noteBox = document.getElementById('noteBox');
-    noteBox.style.display = radio.value === 'lainnya' ? 'block' : 'none';
-}
-
-document.getElementById('reportModal')?.addEventListener('click', function(e) {
-    if (e.target === this) closeReportModal();
-});
-</script>
 @endauth
 
+@push('scripts')
+    <script src="{{ asset('js/reviews.js') }}" defer></script>
+@endpush
 
 @endsection

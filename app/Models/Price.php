@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Price extends Model
+class Price extends BaseModel
 {
     protected $table = 'prices';
 
@@ -13,23 +13,21 @@ class Price extends Model
         'amount',
         'unit',
         'notes',
-        'photo_path',
         'is_active',
+        'media_id',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
-        'amount' => 'decimal:2',
+        'amount'    => 'decimal:2',
     ];
 
-    // Scope untuk harga aktif
-    public function scopeActive($query)
+    public function media(): BelongsTo
     {
-        return $query->where('is_active', true);
+        return $this->belongsTo(Media::class);
     }
 
-    // Accessor format rupiah
-    public function getFormattedAmountAttribute()
+    public function getFormattedAmountAttribute(): string
     {
         return 'Rp ' . number_format($this->amount, 0, ',', '.');
     }

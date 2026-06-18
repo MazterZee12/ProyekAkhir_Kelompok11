@@ -399,3 +399,23 @@ body.theme-pink .btn-primary:hover { background: #be185d; border-color: #be185d;
     }
     .sidebar.show { left: 0; }
 }
+
+/* ===== INFORMATION REQUEST MODULE — palette ===== */
+:root {
+    --ir-primary:   #0EA5E9;
+    --ir-secondary: #06B6D4;
+    --ir-accent:    #14B8A6;
+    --ir-success:   #22C55E;
+    --ir-warning:   #F59E0B;
+    --ir-danger:    #EF4444;
+}
+
+.stat-card.ir-stat-total    { background: linear-gradient(135deg, var(--ir-primary), var(--ir-secondary)); }
+.stat-card.ir-stat-pending  { background: linear-gradient(135deg, #92400e, var(--ir-warning)); }
+.stat-card.ir-stat-answered { background: linear-gradient(135deg, #14532d, var(--ir-success)); }
+.stat-card.ir-stat-closed   { background: linear-gradient(135deg, #334155, #64748b); }
+
+.ir-badge { padding: 4px 12px; border-radius: 30px; font-size: 0.72rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+.ir-badge-pending  { background: rgba(245,158,11,0.12); color: #92400e; }
+.ir-badge-answered { background: rgba(34,197,94,0.12);  color: #14532d; }
+.ir-badge-closed   { background: rgba(100,116,139,0.15); color: #334155; }

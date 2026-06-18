@@ -56,13 +56,18 @@
 {{-- Foto Pantai --}}
 <div class="mb-3">
     <label class="form-label">Foto Pantai</label>
-    <input type="file" name="photo_path" id="photoInput" class="form-control" accept="image/*">
-    <div id="photoPreview" class="mt-2"
-        style="{{ $profile?->photo_path ? '' : 'display:none;' }}">
-        <img id="photoPreviewImg"
-            src="{{ $profile?->photo_path ? asset('storage/'.$profile->photo_path) : '#' }}"
-            width="120" class="img-thumbnail">
-        @if($profile?->photo_path)
+    <input type="file" name="photo" id="photoInput" class="form-control" accept="image/*">
+
+    <div id="photoPreview" class="mt-2" style="{{ $profile?->media ? '' : 'display:none;' }}">
+        <img
+            id="photoPreviewImg"
+            src="{{ $profile?->media?->url ?? '#' }}"
+            width="120"
+            class="img-thumbnail"
+            alt="Preview Foto"
+        >
+
+        @if($profile?->media)
             <small class="d-block text-muted mt-1">Upload foto baru untuk mengganti.</small>
         @endif
     </div>
@@ -80,16 +85,22 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
-    document.getElementById('photoInput').addEventListener('change', function () {
-        if (this.files && this.files[0]) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                document.getElementById('photoPreviewImg').src = e.target.result;
-                document.getElementById('photoPreview').style.display = 'block';
-            };
-            reader.readAsDataURL(this.files[0]);
-        }
-    });
+    const input = document.getElementById('photoInput');
+    const preview = document.getElementById('photoPreview');
+    const previewImg = document.getElementById('photoPreviewImg');
+
+    if (input) {
+        input.addEventListener('change', function () {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    previewImg.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+    }
 });
 </script>
 @endpush

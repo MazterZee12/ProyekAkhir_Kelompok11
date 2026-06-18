@@ -2,77 +2,43 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Announcement extends Model
+class Announcement extends BaseModel
 {
-    /**
-     * Field yang boleh diisi
-     */
     protected $fillable = [
         'title',
         'content',
         'type',
-        'starts_at',
-        'ends_at',
-        'photo_path',
-        'attachment_path',
+        'photo_media_id',
         'is_active',
         'is_featured',
         'views',
     ];
 
-    /**
-     * Cast otomatis
-     */
     protected $casts = [
-        'starts_at'   => 'datetime',
-        'ends_at'     => 'datetime',
         'is_active'   => 'boolean',
         'is_featured' => 'boolean',
+        'views'       => 'integer',
     ];
 
-    /**
-     * Scope untuk announcement aktif
-     */
-    public function scopeActive($query)
+    public function photo(): BelongsTo
     {
-        return $query->where('is_active', true)
-            ->where(function ($q) {
-                $q->whereNull('starts_at')
-                  ->orWhere('starts_at', '<=', now());
-            })
-            ->where(function ($q) {
-                $q->whereNull('ends_at')
-                  ->orWhere('ends_at', '>=', now());
-            });
+        return $this->belongsTo(Media::class, 'photo_media_id');
     }
 
-    /**
-     * Status dinamis
-     */
-    public function getStatusAttribute()
+    public function scopeActive(Builder $query): Builder
     {
-        if (!$this->is_active) {
-            return 'inactive';
-        }
-
-        if ($this->starts_at && now()->lt($this->starts_at)) {
-            return 'scheduled';
-        }
-
-        if ($this->ends_at && now()->gt($this->ends_at)) {
-            return 'expired';
-        }
-
-        return 'active';
+        return $query->where('is_active', true);
     }
 
-    /**
-     * Tambah jumlah views
-     */
-    public function incrementViews()
+    public function getStatusAttribute(): string
+    {
+        return $this->is_active ? 'active' : 'inactive';
+    }
+
+    public function incrementViews(): void
     {
         $this->increment('views');
     }

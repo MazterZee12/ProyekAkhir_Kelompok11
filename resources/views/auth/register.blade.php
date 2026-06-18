@@ -10,7 +10,7 @@
         <div class="login-visual-bg"></div>
         <div class="login-visual-content">
             <a href="{{ url('/') }}" class="login-logo">
-                Pasir Putih <span>Toba</span>
+                Pasir Putih <span>Parparean</span>
             </a>
             <div class="login-visual-quote">
                 <p>"Bergabunglah dengan ribuan wisatawan yang telah merasakan keajaiban Danau Toba."</p>

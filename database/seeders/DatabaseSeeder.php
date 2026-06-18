@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Container\Attributes\Database;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -11,7 +10,12 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             AdminSeeder::class,
-            ScheduleSeeder::class,
+            DummyVisitorSeeder::class,
+            ProfileSeeder::class,
+            ContactSeeder::class,
+            FaqSeeder::class,
+            ReviewSeeder::class,
+            InformationRequestSeeder::class,
         ]);
     }
 }

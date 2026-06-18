@@ -16,10 +16,44 @@ Route::get('reviews', [\App\Http\Controllers\Public\ReviewController::class, 'in
     ->name('reviews.index');
 
 Route::middleware('auth')->group(function () {
-    Route::get('reviews/create',  [\App\Http\Controllers\Public\ReviewController::class, 'create'])->name('reviews.create');
-    Route::post('reviews',        [\App\Http\Controllers\Public\ReviewController::class, 'store'])->name('reviews.store');
-    Route::post('reviews/{review}/report', [\App\Http\Controllers\Public\ReviewController::class, 'report'])->name('reviews.report');
-    Route::delete('reviews/{review}',      [\App\Http\Controllers\Public\ReviewController::class, 'destroy'])->name('reviews.destroy');
+    Route::get('reviews/create', [\App\Http\Controllers\Public\ReviewController::class, 'create'])
+        ->name('reviews.create');
+
+    Route::post('reviews', [\App\Http\Controllers\Public\ReviewController::class, 'store'])
+        ->name('reviews.store');
+
+    Route::get('reviews/{review}/edit', [\App\Http\Controllers\Public\ReviewController::class, 'edit'])
+        ->name('reviews.edit');
+
+    Route::put('reviews/{review}', [\App\Http\Controllers\Public\ReviewController::class, 'update'])
+        ->name('reviews.update');
+
+    Route::delete('reviews/{review}', [\App\Http\Controllers\Public\ReviewController::class, 'destroy'])
+        ->name('reviews.destroy');
+
+    Route::post('reviews/{review}/report', [\App\Http\Controllers\Public\ReviewController::class, 'report'])
+        ->name('reviews.report');
+
+    Route::get('information-requests', [\App\Http\Controllers\Public\InformationRequestController::class, 'index'])
+        ->name('information-requests.index');
+
+    Route::get('information-requests/create', [\App\Http\Controllers\Public\InformationRequestController::class, 'create'])
+        ->name('information-requests.create');
+
+    Route::post('information-requests', [\App\Http\Controllers\Public\InformationRequestController::class, 'store'])
+        ->name('information-requests.store');
+
+    Route::get('information-requests/{informationRequest}', [\App\Http\Controllers\Public\InformationRequestController::class, 'show'])
+        ->name('information-requests.show');
+
+    Route::get('information-requests/{informationRequest}/edit', [\App\Http\Controllers\Public\InformationRequestController::class, 'edit'])
+        ->name('information-requests.edit');
+
+    Route::put('information-requests/{informationRequest}', [\App\Http\Controllers\Public\InformationRequestController::class, 'update'])
+        ->name('information-requests.update');
+
+    Route::delete('information-requests/{informationRequest}', [\App\Http\Controllers\Public\InformationRequestController::class, 'destroy'])
+        ->name('information-requests.destroy');
 });
 
 // Public pages
@@ -62,11 +96,12 @@ Route::middleware(['auth', EnsureAdmin::class])
         Route::get('/dashboard', [App\Http\Controllers\Admin\DashboardController::class, 'index'])
             ->name('dashboard');
 
-        // Reviews — explicit routes only
-        Route::get('reviews',             [ReviewController::class, 'index'])->name('reviews.index');
-        Route::get('reviews/{review}',    [ReviewController::class, 'show'])->name('reviews.show');
+        // Reviews
+        Route::get('reviews', [ReviewController::class, 'index'])->name('reviews.index');
+        Route::get('reviews/{review}', [ReviewController::class, 'show'])->name('reviews.show');
         Route::delete('reviews/{review}', [ReviewController::class, 'destroy'])->name('reviews.destroy');
-        Route::patch('reviews/{review}/unhide', [ReviewController::class, 'unhide'])->name('reviews.unhide');
+        Route::patch('reviews/{review}/toggle-visibility', [ReviewController::class, 'toggleVisibility'])
+            ->name('reviews.toggleVisibility');
 
         // Prices
         Route::resource('prices', App\Http\Controllers\Admin\PriceController::class);
@@ -79,7 +114,6 @@ Route::middleware(['auth', EnsureAdmin::class])
         Route::resource('profiles',    App\Http\Controllers\Admin\ProfileController::class);
         Route::resource('contacts',    App\Http\Controllers\Admin\ContactController::class);
         Route::resource('faqs',        App\Http\Controllers\Admin\FaqController::class);
-        Route::resource('schedules',   App\Http\Controllers\Admin\ScheduleController::class);
 
         // Announcements
         Route::resource('announcements', App\Http\Controllers\Admin\AnnouncementController::class);
@@ -92,4 +126,14 @@ Route::middleware(['auth', EnsureAdmin::class])
         Route::patch('banners/{banner}/toggle',
             [App\Http\Controllers\Admin\BannerController::class, 'toggle'])
             ->name('banners.toggle');
+
+        // Information Requests
+        Route::get('information-requests', [App\Http\Controllers\Admin\InformationRequestController::class, 'index'])
+            ->name('information-requests.index');
+        Route::get('information-requests/{informationRequest}', [App\Http\Controllers\Admin\InformationRequestController::class, 'show'])
+            ->name('information-requests.show');
+        Route::patch('information-requests/{informationRequest}/answer', [App\Http\Controllers\Admin\InformationRequestController::class, 'answer'])
+            ->name('information-requests.answer');
+        Route::patch('information-requests/{informationRequest}/status', [App\Http\Controllers\Admin\InformationRequestController::class, 'updateStatus'])
+            ->name('information-requests.status');
     });

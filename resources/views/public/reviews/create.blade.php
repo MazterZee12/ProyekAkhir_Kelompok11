@@ -1,149 +1,142 @@
 @extends('layouts.public')
 @section('title', 'Tulis Ulasan — Pasir Putih Parparean')
+
+@push('styles')
+    <link rel="stylesheet" href="{{ asset('css/reviews.css') }}">
+@endpush
+
 @section('content')
 
 <section class="page-hero">
-    <div class="page-hero-bg" style="background-image:url('https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRZnjkNXFEsHmn8hQSSkOe0XVmyLx5xMPOD0g&s')"></div>
+    <div class="page-hero-bg" style="background-image:url('https://tobaria.com/wp-content/uploads/2021/04/IMG_20210415_144408-1024x576.jpg')"></div>
     <div class="page-hero-overlay"></div>
     <div class="page-hero-content reveal">
-        <div class="section-label" style="justify-content:center;color:var(--gold)">Ulasan</div>
+        <div class="section-label" style="justify-content:center">Ulasan</div>
         <h1>Bagikan <em>Pengalamanmu</em></h1>
         <p>Ceritakan kesanmu selama berkunjung ke Pasir Putih Parparean</p>
     </div>
 </section>
 
-<section style="padding:80px 0">
-    <div class="container-sm">
+<section class="review-form-section">
+    <div class="review-form-wrap">
 
         @if(session('success'))
-        <div class="alert-success reveal"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
+            <div class="page-alert page-alert-success reveal"><i class="fas fa-check-circle"></i> {{ session('success') }}</div>
+        @endif
+
+        @if(session('info'))
+            <div class="page-alert page-alert-info reveal"><i class="fas fa-info-circle"></i> {{ session('info') }}</div>
+        @endif
+
+        @if(session('error'))
+            <div class="page-alert page-alert-error reveal"><i class="fas fa-exclamation-circle"></i> {{ session('error') }}</div>
         @endif
 
         @if($errors->any())
-        <div class="alert-error reveal"><i class="fas fa-exclamation-circle"></i> {{ $errors->first() }}</div>
+            <div class="page-alert page-alert-error reveal"><i class="fas fa-exclamation-circle"></i> {{ $errors->first() }}</div>
         @endif
 
-        <div class="create-form reveal">
-            <div class="create-form-header">
-                <div class="section-label" style="color:var(--ocean)">{{ $userReview ? 'Edit Ulasan' : 'Tulis Ulasan' }}</div>
-                <h2>{{ $userReview ? 'Perbarui Ulasanmu' : 'Apa Kesanmu?' }}</h2>
-                <p style="color:var(--text-muted)">Ulasanmu membantu pengunjung lain mengetahui lebih lanjut tentang destinasi wisata kami.</p>
+        <div class="review-form-card reveal">
+
+            <div class="rfc-header">
+                <div class="review-avatar rfc-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 2)) }}</div>
+                <div>
+                    <div class="review-name rfc-name">{{ auth()->user()->name }}</div>
+                    <div class="review-date">Menulis ulasan baru</div>
+                </div>
             </div>
 
-            <form action="{{ route('reviews.index') }}" method="POST">
+            <form action="{{ route('reviews.store') }}" method="POST">
                 @csrf
 
-                {{-- STAR RATING --}}
-                <div class="star-section">
-                    <label>Rating Pengalamanmu <span style="color:red">*</span></label>
-                    <div class="stars-input" id="starsInput">
-                        @for($i = 1; $i <= 5; $i++)
-                        <div class="star-wrap" data-value="{{ $i }}">
-                            <button type="button" class="star-half left-half" data-value="{{ $i - 0.5 }}"></button>
-                            <button type="button" class="star-half right-half" data-value="{{ $i }}"></button>
-                            <i class="fas fa-star star-icon" id="star-{{ $i }}"></i>
-                            <span class="star-label">{{ ['Buruk','Kurang','Cukup','Bagus','Luar Biasa'][$i-1] }}</span>
-                        </div>
-                        @endfor
+                <div class="form-block">
+                    <div class="form-label">
+                        <span>Tanggal Kunjungan <span class="required">*</span></span>
                     </div>
-                    <input type="hidden" name="rating" id="ratingInput" value="{{ $userReview->rating ?? old('rating') }}">
-                    @error('rating')<div class="field-error">{{ $message }}</div>@enderror
+                    <input type="date"
+                           name="visit_date"
+                           id="visit_date"
+                           class="date-input {{ $errors->has('visit_date') ? 'has-error' : '' }}"
+                           value="{{ old('visit_date') }}"
+                           max="{{ now()->format('Y-m-d') }}"
+                           required>
+                    @error('visit_date')
+                        <div class="field-error-msg"><i class="fas fa-exclamation-circle"></i> {{ $message }}</div>
+                    @enderror
                 </div>
 
-                {{-- KOMENTAR --}}
-                <div class="form-group">
-                    <label>Ceritakan Pengalamanmu <span style="color:red">*</span></label>
-                    <textarea name="comment" rows="6" class="form-input" placeholder="Bagikan ceritamu tentang Pasir Putih Parparean Minimal 10 karakter." required>{{ $userReview->comment ?? old('comment') }}</textarea>
-                    @error('comment')<div class="field-error">{{ $message }}</div>@enderror
+                <div class="form-block">
+                    <div class="form-label">
+                        <span>Rating Pengalamanmu <span class="required">*</span></span>
+                    </div>
+                    <div class="rating-row">
+                        <div class="star-picker" id="starPicker">
+                            @for($i = 1; $i <= 5; $i++)
+                                <div class="star-wrap" data-value="{{ $i }}">
+                                    <span class="star-char">★</span>
+                                    <button type="button" class="star-half star-half-left" data-value="{{ $i - 0.5 }}" aria-label="{{ $i - 0.5 }} bintang"></button>
+                                    <button type="button" class="star-half star-half-right" data-value="{{ $i }}" aria-label="{{ $i }} bintang"></button>
+                                </div>
+                            @endfor
+                        </div>
+                        <span class="star-hint" id="starHint">Pilih rating</span>
+                    </div>
+                    <input type="hidden" name="rating" id="ratingInput" value="{{ old('rating') }}">
+                    @error('rating')
+                        <div class="field-error-msg"><i class="fas fa-exclamation-circle"></i> {{ $message }}</div>
+                    @enderror
+                </div>
+
+                <div class="form-block">
+                    <div class="form-label">
+                        <span>Ceritakan Pengalamanmu <span class="required">*</span></span>
+                        <span class="char-count" id="charCount">0 / 1000</span>
+                    </div>
+                    <textarea name="comment"
+                              id="comment"
+                              rows="6"
+                              maxlength="1000"
+                              class="{{ $errors->has('comment') ? 'has-error' : '' }}"
+                              placeholder="Bagikan ceritamu tentang Pasir Putih Parparean. Minimal 10 karakter."
+                              required>{{ old('comment') }}</textarea>
+                    @error('comment')
+                        <div class="field-error-msg"><i class="fas fa-exclamation-circle"></i> {{ $message }}</div>
+                    @enderror
                 </div>
 
                 <div class="form-actions">
-                    <a href="{{ route('reviews.index') }}" class="btn-outline-hero">Batal</a>
-                    <button type="submit" class="btn-primary-hero">
+                    <a href="{{ route('reviews.index') }}" class="btn-outline-hero form-btn">Batal</a>
+                    <button type="submit" class="btn-primary-hero form-btn">
                         <i class="fas fa-paper-plane"></i>
-                        {{ $userReview ? 'Perbarui Ulasan' : 'Kirim Ulasan' }}
+                        Kirim Ulasan
                     </button>
                 </div>
             </form>
         </div>
 
-        {{-- INFO --}}
-        <div class="create-info reveal">
-            <div class="create-info-icon"><i class="fas fa-shield-alt"></i></div>
-            <div>
-                <strong>Ulasan kamu aman</strong>
-                <p>Ulasan yang tidak pantas dapat dihapus oleh admin. Harap berikan ulasan yang jujur dan sopan.</p>
+        @if($userReviews->isNotEmpty())
+        <div class="review-history-card reveal">
+            <div class="rh-title"><i class="fas fa-clock-rotate-left"></i> Ulasan kamu sebelumnya</div>
+            <div class="rh-list">
+                @foreach($userReviews as $r)
+                    <div class="rh-row">
+                        <span>{{ $r->visit_date->format('d M Y') }} — {{ $r->rating }}★</span>
+                        @if($r->isEditable())
+                            <a href="{{ route('reviews.edit', $r) }}">Edit</a>
+                        @else
+                            <span class="rh-locked">Terkunci</span>
+                        @endif
+                    </div>
+                @endforeach
             </div>
         </div>
+        @endif
+
     </div>
 </section>
 
-<style>
-.page-hero{position:relative;height:360px;display:flex;align-items:center;justify-content:center;text-align:center;overflow:hidden}
-.page-hero-bg{position:absolute;inset:0;background-size:cover;background-position:center}
-.page-hero-overlay{position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,30,60,.6),rgba(0,10,30,.8))}
-.page-hero-content{position:relative;z-index:2;color:#fff;padding:0 24px}
-.page-hero-content h1{font-size:clamp(1.8rem,4vw,3rem);margin:12px 0}
-.page-hero-content p{opacity:.8}
-.container-sm{max-width:680px;margin:0 auto;padding:0 24px}
-.alert-success,.alert-error{padding:14px 20px;border-radius:10px;margin-bottom:20px;display:flex;align-items:center;gap:10px;font-size:.9rem}
-.alert-success{background:rgba(0,200,100,.1);border:1px solid rgba(0,200,100,.3);color:#00c864}
-.alert-error{background:rgba(200,50,50,.1);border:1px solid rgba(200,50,50,.3);color:#e05252}
-.create-form{background:var(--surface);border:1px solid rgba(255,255,255,.08);border-radius:20px;padding:40px;margin-bottom:20px}
-.create-form-header{margin-bottom:32px}
-.create-form-header h2{font-size:1.8rem;margin:8px 0 12px}
-.star-section{margin-bottom:28px}
-.star-section label{display:block;font-size:.9rem;color:var(--text-muted);margin-bottom:14px}
-.stars-input{display:flex;gap:12px}
-.star-wrap{position:relative;display:flex;flex-direction:column;align-items:center;cursor:pointer;width:64px}
-.star-icon{font-size:2rem;color:rgba(255,255,255,.2);pointer-events:none;transition:color .15s}
-.star-icon.half{background:linear-gradient(90deg, var(--gold) 50%, rgba(255,255,255,.2) 50%);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.star-icon.full{color:var(--gold)}
-.star-half{position:absolute;top:0;width:50%;height:32px;background:none;border:none;cursor:pointer;z-index:2;padding:0}
-.left-half{left:0}
-.right-half{right:0}
-.star-label{font-size:.6rem; font-weight:600; text-transform:uppercase; letter-spacing:.5px; color:var(--text-muted); margin-top:4px; text-align:center; white-space:nowrap;}
-.form-group{margin-bottom:24px}
-.form-group label{display:block;font-size:.9rem;color:var(--text-muted);margin-bottom:8px}
-.form-input{width:100%;background:var(--bg);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:14px 18px;color:#fff;font-size:.95rem;font-family:inherit;transition:border-color .2s;box-sizing:border-box;resize:vertical}
-.form-input:focus{outline:none;border-color:var(--ocean)}
-.field-error{color:#e05252;font-size:.8rem;margin-top:6px}
-.form-actions{display:flex;gap:12px;justify-content:flex-end}
-.create-info{display:flex;gap:16px;align-items:flex-start;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:12px;padding:20px 24px}
-.create-info-icon{color:var(--ocean);font-size:1.2rem;margin-top:2px;flex-shrink:0}
-.create-info strong{display:block;margin-bottom:4px;font-size:.9rem}
-.create-info p{margin:0;font-size:.85rem;color:var(--text-muted);line-height:1.6}
-</style>
+@push('scripts')
+    <script src="{{ asset('js/reviews.js') }}" defer></script>
+@endpush
 
-<script>
-const ratingInput = document.getElementById('ratingInput');
-const starIcons = document.querySelectorAll('.star-icon');
-
-function renderStars(value) {
-    starIcons.forEach((icon, i) => {
-        const starNum = i + 1;
-        icon.className = 'fas fa-star star-icon';
-        if (value >= starNum) {
-            icon.classList.add('full');
-        } else if (value >= starNum - 0.5) {
-            icon.classList.add('half');
-        }
-    });
-}
-
-document.querySelectorAll('.star-half').forEach(btn => {
-    btn.addEventListener('mouseenter', () => renderStars(parseFloat(btn.dataset.value)));
-    btn.addEventListener('click', () => {
-        ratingInput.value = btn.dataset.value;
-        renderStars(parseFloat(btn.dataset.value));
-    });
-});
-
-document.getElementById('starsInput').addEventListener('mouseleave', () => {
-    renderStars(parseFloat(ratingInput.value) || 0);
-});
-
-// Init jika ada nilai awal
-if (ratingInput.value) renderStars(parseFloat(ratingInput.value));
-</script>
 @endsection

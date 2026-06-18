@@ -3,145 +3,120 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Facility;
-use App\Services\FileUploadService;
+use App\Services\MediaService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class FacilityController extends Controller
 {
-    protected $fileService;
+    protected MediaService $media;
 
-    public function __construct(FileUploadService $fileService)
+    public function __construct(MediaService $media)
     {
-        $this->fileService = $fileService;
+        $this->media = $media;
     }
 
-    /**
-     * Tampilkan daftar fasilitas.
-     */
     public function index()
     {
-        $facilities = Facility::orderBy('created_at', 'desc')->paginate(15);
+        $facilities = Facility::latest()->paginate(15);
         return view('admin.facilities.index', compact('facilities'));
     }
 
-    /**
-     * Tampilkan form buat fasilitas baru.
-     */
     public function create()
     {
         $facility = null;
         return view('admin.facilities.create', compact('facility'));
     }
 
-    /**
-     * Simpan fasilitas baru.
-     */
     public function store(Request $request)
     {
         $data = $request->validate([
-            'name'          => 'required|string|max:255',
-            'description'   => 'nullable|string',
-            'photo'          => 'nullable|image|max:10240',
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'photo'       => 'nullable|image|max:10240',
         ]);
 
         try {
             if ($request->hasFile('photo')) {
-                // store file
-                $data['photo_path'] = $this->fileService->upload($request->file('photo'), 'facilities');
+                $data['media_id'] = $this->media->store(
+                    $request->file('photo'),
+                    'facilities'
+                )->id;
             }
 
             Facility::create($data);
 
-            return redirect()->route('admin.facilities.index')
-                             ->with('success', 'Facility created.');
-
-        } catch (\RuntimeException $e) {
-            // error dari FileUploadService
-            return back()->withInput()->with('error', $e->getMessage());
+            return redirect()
+                ->route('admin.facilities.index')
+                ->with('success', 'Fasilitas berhasil disimpan.');
 
         } catch (\Exception $e) {
-            Log::error('FacilityController::store failed', [
-                'error' => $e->getMessage()
-            ]);
+            Log::error('FacilityController::store failed', ['error' => $e->getMessage()]);
             return back()->withInput()->with('error', 'Gagal menyimpan fasilitas.');
         }
     }
 
-    /**
-     * Tampilkan fasilitas tertentu.
-     */
     public function show(Facility $facility)
     {
         return view('admin.facilities.show', compact('facility'));
     }
 
-    /**
-     * Tampilkan form edit fasilitas.
-     */
     public function edit(Facility $facility)
     {
-            return view('admin.facilities.edit', compact('facility'));
+        return view('admin.facilities.edit', compact('facility'));
     }
 
-    /**
-     * Update fasilitas.
-     */
     public function update(Request $request, Facility $facility)
     {
         $data = $request->validate([
-            'name'          => 'required|string|max:255',
-            'description'   => 'nullable|string',
-            'photo'          => 'nullable|image|max:10240',
+            'name'        => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'photo'       => 'nullable|image|max:10240',
         ]);
 
         try {
             if ($request->hasFile('photo')) {
-                // store file
-                $data['photo_path'] = $this->fileService->replace($facility->photo_path, $request->file('photo'), 'facilities');
+                $data['media_id'] = $this->media->replace(
+                    $facility->media,
+                    $request->file('photo'),
+                    'facilities'
+                )->id;
             }
 
             $facility->update($data);
 
-            return redirect()->route('admin.facilities.index')
-                             ->with('success', 'Facility updated.');
-
-        } catch (\RuntimeException $e) {
-            // error dari FileUploadService
-            return back()->withInput()->with('error', $e->getMessage());
+            return redirect()
+                ->route('admin.facilities.index')
+                ->with('success', 'Fasilitas berhasil diperbarui.');
 
         } catch (\Exception $e) {
             Log::error('FacilityController::update failed', [
                 'id'    => $facility->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
             return back()->withInput()->with('error', 'Gagal memperbarui fasilitas.');
         }
     }
 
-    /**
-     * Hapus fasilitas.
-     */
     public function destroy(Facility $facility)
     {
         try {
-            if ($facility->photo_path) {
-                $this->fileService->delete($facility->photo_path);
-            }
-
+            $this->media->delete($facility->media);
             $facility->delete();
 
-            return redirect()->route('admin.facilities.index')
-                            ->with('success', 'Facility deleted.');
+            return redirect()
+                ->route('admin.facilities.index')
+                ->with('success', 'Fasilitas berhasil dihapus.');
 
         } catch (\Exception $e) {
             Log::error('FacilityController::destroy failed', [
                 'id'    => $facility->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
-            return redirect()->route('admin.facilities.index')
-                            ->with('error', 'Gagal menghapus fasilitas.');
+            return redirect()
+                ->route('admin.facilities.index')
+                ->with('error', 'Gagal menghapus fasilitas.');
         }
     }
 }

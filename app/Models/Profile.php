@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Profile extends Model
+class Profile extends BaseModel
 {
     protected $fillable = [
         'name',
@@ -14,17 +14,17 @@ class Profile extends Model
         'mission',
         'established_year',
         'regulations',
-        'photo_path',
-        'is_active'
+        'is_active',
+        'media_id',
     ];
 
     protected $casts = [
-        'is_active'         => 'boolean',
-        'established_year'  => 'integer',
+        'is_active'        => 'boolean',
+        'established_year' => 'integer',
     ];
 
-    public function scopeActive($query)
+    public function media(): BelongsTo
     {
-        return $query->where('is_active', true);
+        return $this->belongsTo(Media::class);
     }
 }

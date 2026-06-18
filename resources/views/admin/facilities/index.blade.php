@@ -26,15 +26,18 @@
                     <tr>
                         <td>{{ $facilities->firstItem() + $loop->index }}</td>
                         <td>
-                            @if($facility->photo_path)
-                                <img src="{{ asset('storage/'.$facility->photo_path) }}"
-                                    width="80" class="img-thumbnail">
+                            @if($facility->media)
+                                <img src="{{ $facility->media->url }}"
+                                     width="80"
+                                     height="80"
+                                     style="object-fit: cover;"
+                                     class="img-thumbnail">
                             @else
                                 <span class="text-muted">-</span>
                             @endif
                         </td>
                         <td><strong>{{ $facility->name }}</strong></td>
-                        <td>{{ Str::limit($facility->description, 60) ?? '-' }}</td>
+                        <td>{{ $facility->description ? \Illuminate\Support\Str::limit($facility->description, 60) : '-' }}</td>
                         <td style="white-space:nowrap;">
                             <a href="{{ route('admin.facilities.show', $facility->id) }}"
                                 class="btn btn-sm btn-info">Lihat</a>
@@ -55,6 +58,7 @@
                 @endforelse
                 </tbody>
             </table>
+
             <div class="mt-3">{{ $facilities->links() }}</div>
         </div>
     </div>

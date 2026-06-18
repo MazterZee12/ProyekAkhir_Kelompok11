@@ -3,25 +3,23 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Price;
-use App\Services\FileUploadService;
+use App\Services\MediaService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 
 class PriceController extends Controller
 {
-    protected $upload;
+    protected MediaService $media;
 
-    public function __construct(FileUploadService $upload)
+    public function __construct(MediaService $media)
     {
-        $this->upload = $upload;
+        $this->media = $media;
     }
 
     public function index()
     {
-        $prices = Price::orderBy('type')
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+        $prices = Price::with('media')->orderBy('type')->orderBy('created_at', 'desc')->paginate(20);
         return view('admin.prices.index', compact('prices'));
     }
 
@@ -45,24 +43,20 @@ class PriceController extends Controller
 
         try {
             if ($request->hasFile('photo')) {
-                $data['photo_path'] = $this->upload->upload(
+                $data['media_id'] = $this->media->store(
                     $request->file('photo'),
                     'prices'
-                );
+                )->id;
             }
 
             Price::create($data);
 
             return redirect()
                 ->route('admin.prices.index')
-                ->with('success', 'Price created successfully.');
+                ->with('success', 'Harga berhasil disimpan.');
 
-        } catch (\RuntimeException $e) {
-            return back()->withInput()->with('error', $e->getMessage());
         } catch (\Exception $e) {
-            Log::error('PriceController::store failed', [
-                'error' => $e->getMessage()
-            ]);
+            Log::error('PriceController::store failed', ['error' => $e->getMessage()]);
             return back()->withInput()->with('error', 'Gagal menyimpan harga.');
         }
     }
@@ -91,25 +85,21 @@ class PriceController extends Controller
 
         try {
             if ($request->hasFile('photo')) {
-                $data['photo_path'] = $this->upload->replace(
-                    $price->photo_path,
-                    $request->file('photo'),
-                    'prices'
-                );
+                $data['media_id'] = $price->media
+                    ? $this->media->replace($price->media, $request->file('photo'), 'prices')->id
+                    : $this->media->store($request->file('photo'), 'prices')->id;
             }
 
             $price->update($data);
 
             return redirect()
                 ->route('admin.prices.index')
-                ->with('success', 'Price updated.');
+                ->with('success', 'Harga berhasil diperbarui.');
 
-        } catch (\RuntimeException $e) {
-            return back()->withInput()->with('error', $e->getMessage());
         } catch (\Exception $e) {
             Log::error('PriceController::update failed', [
                 'id'    => $price->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
             return back()->withInput()->with('error', 'Gagal memperbarui harga.');
         }
@@ -118,17 +108,19 @@ class PriceController extends Controller
     public function destroy(Price $price)
     {
         try {
-            $this->upload->delete($price->photo_path);
+            if ($price->media) {
+                $this->media->delete($price->media);
+            }
             $price->delete();
 
             return redirect()
                 ->route('admin.prices.index')
-                ->with('success', 'Price deleted.');
+                ->with('success', 'Harga berhasil dihapus.');
 
         } catch (\Exception $e) {
             Log::error('PriceController::destroy failed', [
                 'id'    => $price->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
             return redirect()
                 ->route('admin.prices.index')
@@ -141,15 +133,13 @@ class PriceController extends Controller
         try {
             $price->is_active = !$price->is_active;
             $price->save();
-
-            return back()->with('success', 'Status updated.');
-
+            return back()->with('success', 'Status berhasil diperbarui.');
         } catch (\Exception $e) {
             Log::error('PriceController::toggle failed', [
                 'id'    => $price->id,
-                'error' => $e->getMessage()
+                'error' => $e->getMessage(),
             ]);
-            return back()->with('error', 'Gagal memperbarui status harga.');
+            return back()->with('error', 'Gagal memperbarui status.');
         }
     }
 }
