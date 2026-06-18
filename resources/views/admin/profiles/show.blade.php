@@ -9,13 +9,15 @@
             <a href="{{ route('admin.profiles.index') }}" class="btn btn-secondary">Back</a>
         </div>
     </div>
+
     <div class="card">
         <div class="card-body">
-            @if($profile->logo_path)
+            @if($profile->media)
                 <div class="mb-4">
-                    <img src="{{ asset('storage/'.$profile->logo_path) }}" width="150" class="img-thumbnail">
+                    <img src="{{ $profile->media->url }}" width="150" class="img-thumbnail" alt="Foto Profil">
                 </div>
             @endif
+
             <table class="table table-bordered">
                 <tr>
                     <th width="200">Name</th>

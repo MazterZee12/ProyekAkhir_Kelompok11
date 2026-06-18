@@ -42,11 +42,11 @@
     <label class="form-label">Photo</label>
     <input type="file" name="photo" id="photoInput" class="form-control" accept="image/*">
     <div id="photoPreview" class="mt-2"
-        style="{{ $price?->photo_path ? '' : 'display:none;' }}">
+        style="{{ $price?->media ? '' : 'display:none;' }}">
         <img id="photoPreviewImg"
-            src="{{ $price?->photo_path ? asset('storage/'.$price->photo_path) : '#' }}"
+            src="{{ $price?->media?->url ?? '#' }}"
             width="150" class="img-thumbnail">
-        @if($price?->photo_path)
+        @if($price?->media)
             <small class="d-block text-muted mt-1">Upload foto baru untuk mengganti.</small>
         @endif
     </div>

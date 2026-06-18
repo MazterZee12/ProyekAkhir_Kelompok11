@@ -1,35 +1,44 @@
 <?php
 
 namespace App\Http\Controllers\Admin;
+
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use App\Models\Review;
 use App\Models\Announcement;
 use App\Models\Gallery;
+use App\Models\InformationRequest;
 
 class DashboardController extends Controller
 {
     /**
-     * Tampilkan halaman dashboard.
+     * Tampilkan halaman dashboard admin.
      */
     public function index()
-{
-    $totalUsers          = User::where('role', 'user')->count();
+    {
+        // Statistik Dasar
+        $totalUsers          = User::where('role', 'user')->count();
         $totalReviews        = Review::count();
         $totalAnnouncements  = Announcement::count();
-        $activeAnnouncements = Announcement::where('is_active', true)->count();
+        $activeAnnouncements = Announcement::active()->count();
         $totalGalleries      = Gallery::count();
-        $recentReviews       = Review::with('user')->latest()->take(5)->get();
-        $recentAnnouncements = Announcement::latest()->take(5)->get();
         $averageRating       = Review::avg('rating') ?? 0;
 
-        /**
-         * Distribusi rating 1 sampai 5
-         */
+        // Data Terbaru
+        $recentReviews       = Review::with('user')->latest()->take(5)->get();
+        $recentAnnouncements = Announcement::with('photo')->latest()->take(5)->get();
+
+        // Distribusi Rating untuk Chart
         $ratingDistribution = [];
         for ($i = 1; $i <= 5; $i++) {
             $ratingDistribution[] = Review::where('rating', $i)->count();
         }
+
+        // Statistik Permintaan Informasi (Fitur Baru)
+        $totalInformationRequests    = InformationRequest::count();
+        $pendingInformationRequests  = InformationRequest::pending()->count();
+        $answeredInformationRequests = InformationRequest::answered()->count();
+        $closedInformationRequests   = InformationRequest::closed()->count();
 
         return view('admin.dashboard', compact(
             'totalUsers',
@@ -41,6 +50,10 @@ class DashboardController extends Controller
             'recentAnnouncements',
             'ratingDistribution',
             'averageRating',
+            'totalInformationRequests',
+            'pendingInformationRequests',
+            'answeredInformationRequests',
+            'closedInformationRequests',
         ));
     }
 }

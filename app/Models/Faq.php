@@ -1,9 +1,8 @@
 <?php
 
 namespace App\Models;
-use Illuminate\Database\Eloquent\Model;
 
-class Faq extends Model
+class Faq extends BaseModel
 {
     protected $fillable = [
         'question',
@@ -16,9 +15,4 @@ class Faq extends Model
         'is_active' => 'boolean',
         'order'     => 'integer',
     ];
-
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
 }

@@ -25,8 +25,11 @@
                     <tr>
                         <td>{{ $banners->firstItem() + $loop->index }}</td>
                         <td>
-                            <img src="{{ asset('storage/'.$banner->image_path) }}"
-                                width="120" class="img-thumbnail">
+                            @if($banner->media)
+                                <img src="{{ $banner->media->url }}" width="120" class="img-thumbnail" alt="{{ $banner->title }}">
+                            @else
+                                <span class="text-muted">-</span>
+                            @endif
                         </td>
                         <td><strong>{{ $banner->title }}</strong></td>
                         <td>{{ $banner->order }}</td>
@@ -38,14 +41,11 @@
                             @endif
                         </td>
                         <td style="white-space:nowrap;">
-                            <a href="{{ route('admin.banners.show', $banner->id) }}"
-                                class="btn btn-sm btn-info">Lihat</a>
+                            <a href="{{ route('admin.banners.show', $banner->id) }}" class="btn btn-sm btn-info">Lihat</a>
 
-                            <a href="{{ route('admin.banners.edit', $banner->id) }}"
-                                class="btn btn-sm btn-warning">Edit</a>
+                            <a href="{{ route('admin.banners.edit', $banner->id) }}" class="btn btn-sm btn-warning">Edit</a>
 
-                            <form action="{{ route('admin.banners.toggle', $banner->id) }}"
-                                method="POST" class="d-inline">
+                            <form action="{{ route('admin.banners.toggle', $banner->id) }}" method="POST" class="d-inline">
                                 @csrf
                                 @method('PATCH')
                                 @if($banner->is_active)
@@ -76,7 +76,6 @@
 
 </div>
 
-{{-- Modal Konfirmasi Delete --}}
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">

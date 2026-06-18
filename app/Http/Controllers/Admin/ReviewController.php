@@ -14,19 +14,16 @@ class ReviewController extends Controller
         $query = Review::with('user')->orderByDesc('created_at');
 
         if ($request->filled('status')) {
-            if ($request->status === 'trashed') {
-                $query->onlyTrashed();
-            } elseif ($request->status === 'hidden') {
+            if ($request->status === 'hidden') {
                 $query->where('is_hidden', true);
-            } elseif ($request->status === 'reported') {
-                $query->where('reports_count', '>', 0);
+            } elseif ($request->status === 'visible') {
+                $query->where('is_hidden', false);
             }
         }
 
-        $reviews        = $query->paginate(20);
-        $reportedCount  = Review::where('reports_count', '>', 0)->where('is_hidden', false)->count();
+        $reviews = $query->paginate(20);
 
-        return view('admin.reviews.index', compact('reviews', 'reportedCount'));
+        return view('admin.reviews.index', compact('reviews'));
     }
 
     public function show(Review $review)
@@ -38,55 +35,40 @@ class ReviewController extends Controller
     {
         try {
             $review->delete();
+
             return redirect()
                 ->route('admin.reviews.index')
-                ->with('success', 'Review dihapus.');
+                ->with('success', 'Review berhasil dihapus.');
         } catch (\Exception $e) {
-            Log::error('ReviewController::destroy failed', [
+            Log::error('Admin\\ReviewController::destroy failed', [
                 'id'    => $review->id,
                 'error' => $e->getMessage(),
             ]);
+
             return redirect()
                 ->route('admin.reviews.index')
                 ->with('error', 'Gagal menghapus review.');
         }
     }
 
-    public function restore($id)
+    public function toggleVisibility(Review $review)
     {
         try {
-            $review = Review::withTrashed()->findOrFail($id);
-            $review->restore();
-            return redirect()
-                ->route('admin.reviews.index')
-                ->with('success', 'Review dipulihkan.');
-        } catch (\Exception $e) {
-            Log::error('ReviewController::restore failed', [
-                'id'    => $id,
-                'error' => $e->getMessage(),
-            ]);
-            return redirect()
-                ->route('admin.reviews.index')
-                ->with('error', 'Gagal memulihkan review.');
-        }
-    }
-
-    // Tampilkan kembali review yang disembunyikan
-    public function unhide(Review $review)
-    {
-        try {
-            $review->is_hidden      = false;
-            $review->reports_count  = 0;
-            $review->report_reasons = null;
+            $review->is_hidden = ! $review->is_hidden;
             $review->save();
 
-            return back()->with('success', 'Review ditampilkan kembali.');
+            $message = $review->is_hidden
+                ? 'Review disembunyikan.'
+                : 'Review ditampilkan kembali.';
+
+            return back()->with('success', $message);
         } catch (\Exception $e) {
-            Log::error('ReviewController::unhide failed', [
+            Log::error('Admin\\ReviewController::toggleVisibility failed', [
                 'id'    => $review->id,
                 'error' => $e->getMessage(),
             ]);
-            return back()->with('error', 'Gagal menampilkan review.');
+
+            return back()->with('error', 'Gagal mengubah status review.');
         }
     }
 }

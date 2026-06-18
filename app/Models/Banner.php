@@ -1,17 +1,17 @@
 <?php
 
 namespace App\Models;
-use Illuminate\Database\Eloquent\Model;
 
-class Banner extends Model
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+
+class Banner extends BaseModel
 {
     protected $fillable = [
         'title',
         'subtitle',
-        'url',
-        'image_path',
         'order',
         'is_active',
+        'media_id',
     ];
 
     protected $casts = [
@@ -19,8 +19,8 @@ class Banner extends Model
         'order'     => 'integer',
     ];
 
-    public function scopeActive($query)
+    public function media(): BelongsTo
     {
-        return $query->where('is_active', true);
+        return $this->belongsTo(Media::class);
     }
 }

@@ -1,14 +1,14 @@
-{{-- CHATBOT WIDGET --}}
+{{-- resources/views/public/partials/_chatbot.blade.php --}}
 <div class="chat-widget" id="chatWidget">
 
-    {{-- Toggle Button --}}
+    {{-- Toggle --}}
     <button class="chat-toggle" id="chatToggle" aria-label="Buka Chat">
         <i class="fas fa-comments chat-icon-open"></i>
         <i class="fas fa-times chat-icon-close"></i>
         <span class="chat-badge" id="chatBadge">1</span>
     </button>
 
-    {{-- Chat Popup --}}
+    {{-- Popup --}}
     <div class="chat-popup" id="chatPopup">
 
         {{-- Header --}}
@@ -23,7 +23,7 @@
                     Online sekarang
                 </div>
             </div>
-            <button class="chat-header-close" id="chatClose">
+            <button class="chat-header-close" id="chatClose" aria-label="Tutup">
                 <i class="fas fa-times"></i>
             </button>
         </div>
@@ -35,12 +35,8 @@
                 <div class="chat-msg-bubble">
                     Halo! 👋 Selamat datang di Pasir Putih Parparean.<br>
                     Ada yang bisa saya bantu? Tanyakan tentang harga tiket, fasilitas, jadwal, atau info lainnya!
-                    <br><br>
-                    Hello! Welcome to Pasir Putih Parparean. How can I help you today?
                 </div>
             </div>
-
-            {{-- Quick replies --}}
             <div class="chat-quick-replies" id="quickReplies">
                 <button class="chat-quick-btn" data-msg="Berapa harga tiket masuk?">🎫 Harga Tiket</button>
                 <button class="chat-quick-btn" data-msg="Apa saja fasilitas yang tersedia?">🏖️ Fasilitas</button>
@@ -49,7 +45,7 @@
             </div>
         </div>
 
-        {{-- Typing indicator --}}
+        {{-- Typing --}}
         <div class="chat-typing" id="chatTyping">
             <div class="chat-msg-avatar"><i class="fas fa-umbrella-beach"></i></div>
             <div class="chat-typing-dots">
@@ -61,15 +57,13 @@
         <div class="chat-input-area">
             <div class="chat-input-wrap">
                 <input type="text" id="chatInput"
-                    placeholder="Ketik pesan... / Type a message..."
+                    placeholder="Ketik pesan..."
                     maxlength="500" autocomplete="off">
-                <button class="chat-send" id="chatSend" disabled>
+                <button class="chat-send" id="chatSend" disabled aria-label="Kirim">
                     <i class="fas fa-paper-plane"></i>
                 </button>
             </div>
-            <div class="chat-footer-note">
-                Powered by AI · Pasir Putih Parparean
-            </div>
+            <div class="chat-footer-note">Powered by AI · Pasir Putih Parparean</div>
         </div>
 
     </div>

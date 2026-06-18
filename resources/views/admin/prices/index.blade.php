@@ -26,8 +26,8 @@
                     <tr>
                         <td>{{ $prices->firstItem() + $loop->index }}</td>
                         <td>
-                            @if($price->photo_path)
-                                <img src="{{ asset('storage/'.$price->photo_path) }}"
+                            @if($price->media)
+                                <img src="{{ $price->media->url }}"
                                     width="80" class="img-thumbnail">
                             @else
                                 <span class="text-muted">-</span>

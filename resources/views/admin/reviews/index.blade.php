@@ -6,25 +6,20 @@
 <div class="container-fluid">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold mb-0">
-            Kelola Ulasan
-            @if($reportedCount > 0)
-                <span class="badge bg-danger ms-2">{{ $reportedCount }} dilaporkan</span>
-            @endif
-        </h4>
-        {{-- Filter --}}
+        <h4 class="fw-bold mb-0">Kelola Ulasan</h4>
+
         <div class="d-flex gap-2">
             <a href="{{ route('admin.reviews.index') }}"
-                class="btn btn-sm {{ !request('status') ? 'btn-primary' : 'btn-outline-secondary' }}">
+               class="btn btn-sm {{ !request('status') ? 'btn-primary' : 'btn-outline-secondary' }}">
                 Semua
             </a>
-            <a href="{{ route('admin.reviews.index', ['status' => 'reported']) }}"
-                class="btn btn-sm {{ request('status') === 'reported' ? 'btn-danger' : 'btn-outline-danger' }}">
-                Dilaporkan
-            </a>
             <a href="{{ route('admin.reviews.index', ['status' => 'hidden']) }}"
-                class="btn btn-sm {{ request('status') === 'hidden' ? 'btn-secondary' : 'btn-outline-secondary' }}">
+               class="btn btn-sm {{ request('status') === 'hidden' ? 'btn-secondary' : 'btn-outline-secondary' }}">
                 Disembunyikan
+            </a>
+            <a href="{{ route('admin.reviews.index', ['status' => 'visible']) }}"
+               class="btn btn-sm {{ request('status') === 'visible' ? 'btn-secondary' : 'btn-outline-secondary' }}">
+                Terlihat
             </a>
         </div>
     </div>
@@ -39,8 +34,7 @@
                             <th>Pengguna</th>
                             <th>Rating</th>
                             <th>Komentar</th>
-                            <th>Laporan</th>
-                            <th>Tanggal</th>
+                            <th>Tanggal Kunjungan / Ulasan</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -56,33 +50,33 @@
                                 @endfor
                             </td>
                             <td>
-                                {{ Str::limit($review->comment, 60) }}
+                                {{ \Illuminate\Support\Str::limit($review->comment, 60) }}
                                 @if($review->is_hidden)
                                     <span class="badge bg-secondary ms-1">Disembunyikan</span>
                                 @endif
                             </td>
                             <td>
-                                @if($review->reports_count > 0)
-                                    <span class="badge bg-danger">
-                                        {{ $review->reports_count }}x
-                                    </span>
-                                @else
-                                    <span class="text-muted">-</span>
-                                @endif
+                                <div class="fw-bold text-dark">
+                                    {{ \Carbon\Carbon::parse($review->visit_date)->format('d M Y') }}
+                                </div>
+                                <small class="text-muted d-block" style="font-size: 0.75rem;">
+                                    Dibuat: {{ $review->created_at->format('d M Y') }}
+                                </small>
                             </td>
-                            <td>{{ $review->created_at->format('d M Y') }}</td>
                             <td style="white-space:nowrap;">
                                 <a href="{{ route('admin.reviews.show', $review) }}"
-                                    class="btn btn-sm btn-info">Detail</a>
+                                   class="btn btn-sm btn-info">Detail</a>
 
-                                @if($review->is_hidden)
-                                    <form action="{{ route('admin.reviews.unhide', $review) }}"
-                                        method="POST" class="d-inline">
-                                        @csrf
-                                        @method('PATCH')
+                                <form action="{{ route('admin.reviews.toggleVisibility', $review) }}"
+                                      method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    @if($review->is_hidden)
                                         <button class="btn btn-sm btn-success">Tampilkan</button>
-                                    </form>
-                                @endif
+                                    @else
+                                        <button class="btn btn-sm btn-secondary">Sembunyikan</button>
+                                    @endif
+                                </form>
 
                                 <button type="button" class="btn btn-sm btn-danger"
                                     data-bs-toggle="modal" data-bs-target="#deleteModal"
@@ -94,16 +88,16 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="7" class="text-center text-muted">Belum ada ulasan.</td>
+                            <td colspan="6" class="text-center text-muted">Belum ada ulasan.</td>
                         </tr>
                     @endforelse
                     </tbody>
                 </table>
             </div>
+
             <div class="mt-3">{{ $reviews->links() }}</div>
         </div>
     </div>
-
 </div>
 
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
@@ -129,7 +123,6 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')

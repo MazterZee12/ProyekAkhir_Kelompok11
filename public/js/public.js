@@ -1,4 +1,8 @@
-// ===== NAVBAR SCROLL =====
+/* ============================================================
+   public.js — Pasir Putih Parparean
+   ============================================================ */
+
+// ── Navbar scroll ──────────────────────────────────────────
 const navbar = document.getElementById('navbar');
 
 function updateNavbar() {
@@ -9,81 +13,71 @@ function updateNavbar() {
     }
 }
 
+window.addEventListener('scroll', updateNavbar, { passive: true });
 window.addEventListener('pageshow', () => {
-    navLinks.style.cssText = '';
     menuOpen = false;
+    if (navLinks) navLinks.style.cssText = '';
     updateNavbar();
 });
-window.addEventListener('scroll', updateNavbar);
 updateNavbar();
 
-// ===== SCROLL REVEAL =====
+// ── Scroll reveal ──────────────────────────────────────────
 const reveals = document.querySelectorAll('.reveal, .feature-item, .bento-item');
-const observer = new IntersectionObserver((entries) => {
+const revealObserver = new IntersectionObserver((entries) => {
     entries.forEach((entry, i) => {
         if (entry.isIntersecting) {
-            setTimeout(() => entry.target.classList.add('visible'), i * 80);
-            observer.unobserve(entry.target);
+            setTimeout(() => entry.target.classList.add('visible'), i * 70);
+            revealObserver.unobserve(entry.target);
         }
     });
-}, { threshold: 0.1 });
-reveals.forEach(el => observer.observe(el));
+}, { threshold: 0.08 });
 
-// ===== HAMBURGER MOBILE =====
+reveals.forEach(el => revealObserver.observe(el));
+
+// ── Hamburger ──────────────────────────────────────────────
 const hamburger = document.getElementById('hamburger');
 const navLinks  = document.querySelector('.nav-links');
 let menuOpen    = false;
 
-hamburger.addEventListener('click', () => {
-    menuOpen = !menuOpen;
-    if (menuOpen) {
-        navLinks.style.cssText = `
+if (hamburger && navLinks) {
+    hamburger.addEventListener('click', () => {
+        menuOpen = !menuOpen;
+        navLinks.style.cssText = menuOpen ? `
             display: flex;
             flex-direction: column;
             position: fixed;
-            top: 60px;
+            top: 64px;
             left: 0;
             right: 0;
-            background: rgba(13,31,45,0.85);
-            backdrop-filter: blur(12px);
-            padding: 24px;
-            gap: 8px;
-            z-index: 999;
-            overflow-y: auto;
-        `;
-    } else {
-        navLinks.style.cssText = '';
-        menuOpen = false;
-    }
-});
-
-navLinks.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-        menuOpen = false;
-        navLinks.style.cssText = '';
+            background: rgba(6, 13, 24, 0.97);
+            backdrop-filter: blur(20px);
+            padding: 20px 24px;
+            gap: 4px;
+            z-index: 99;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        ` : '';
     });
-});
 
-window.addEventListener('resize', () => {
-    if (window.innerWidth > 1080) {
-        menuOpen = false;
-        navLinks.style.cssText = '';
-    }
-});
-
-navLinks.querySelectorAll('a').forEach(link => {
-    link.addEventListener('click', () => {
-        menuOpen = false;
-        navLinks.style.cssText = '';
-        navLinks.querySelectorAll('li').forEach(li => li.style.cssText = '');
+    navLinks.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', () => {
+            menuOpen = false;
+            navLinks.style.cssText = '';
+        });
     });
-});
 
-// ===== USER DROPDOWN =====
+    window.addEventListener('resize', () => {
+        if (window.innerWidth > 1080) {
+            menuOpen = false;
+            navLinks.style.cssText = '';
+        }
+    });
+}
+
+// ── User dropdown ──────────────────────────────────────────
 const userMenuBtn      = document.getElementById('userMenuBtn');
 const userMenuDropdown = document.getElementById('userMenuDropdown');
 
-if (userMenuBtn) {
+if (userMenuBtn && userMenuDropdown) {
     userMenuBtn.addEventListener('click', (e) => {
         e.stopPropagation();
         userMenuDropdown.classList.toggle('open');
@@ -93,10 +87,9 @@ if (userMenuBtn) {
         userMenuDropdown.classList.remove('open');
     });
 
-    // ===== SESSION TIMEOUT =====
+    // ── Session timeout (30 min) ──────────────────────────
     const SESSION_TIMEOUT = 30 * 60 * 1000;
-    const WARNING_BEFORE  = 2 * 60 * 1000;
-
+    const WARNING_BEFORE  = 2  * 60 * 1000;
     let timeoutTimer, warningTimer;
 
     function resetTimers() {
@@ -114,15 +107,14 @@ if (userMenuBtn) {
         }, SESSION_TIMEOUT);
     }
 
-    if (document.getElementById('userMenuBtn')) {
-        ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'].forEach(event => {
-            document.addEventListener(event, resetTimers, { passive: true });
-        });
-        resetTimers();
-    }
+    ['click', 'keydown', 'mousemove', 'scroll', 'touchstart'].forEach(event => {
+        document.addEventListener(event, resetTimers, { passive: true });
+    });
+
+    resetTimers();
 }
 
-// ===== HERO CAROUSEL =====
+// ── Hero carousel ──────────────────────────────────────────
 (function () {
     const slides = document.querySelectorAll('.hero-slide');
     const texts  = document.querySelectorAll('.hero-text');
@@ -134,11 +126,11 @@ if (userMenuBtn) {
 
     function goTo(n) {
         slides[current].classList.remove('active');
-        texts[current].classList.remove('active');
+        texts[current]?.classList.remove('active');
         dots[current]?.classList.remove('active');
         current = (n + slides.length) % slides.length;
         slides[current].classList.add('active');
-        texts[current].classList.add('active');
+        texts[current]?.classList.add('active');
         dots[current]?.classList.add('active');
     }
 
@@ -153,174 +145,127 @@ if (userMenuBtn) {
     startTimer();
 })();
 
-// ===== CHATBOT WIDGET =====
+// ── FAQ accordion ──────────────────────────────────────────
+function toggleFaq(el) {
+    const isOpen = el.classList.contains('open');
+    document.querySelectorAll('.faq-item.open').forEach(item => item.classList.remove('open'));
+    if (!isOpen) el.classList.add('open');
+}
+
+// ── Gallery lightbox ───────────────────────────────────────
+function openLightbox(src, title) {
+    const lb  = document.getElementById('lightbox');
+    const img = document.getElementById('lightbox-img');
+    const cap = document.getElementById('lightbox-caption');
+    if (!lb) return;
+    img.src = src;
+    img.style.display = 'block';
+    cap.textContent = title || '';
+    lb.classList.add('open');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeLightbox() {
+    const lb = document.getElementById('lightbox');
+    if (!lb) return;
+    lb.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeLightbox();
+});
+
+// ── Alert auto-dismiss ─────────────────────────────────────
+document.querySelectorAll('.js-alert').forEach(el => {
+    setTimeout(() => {
+        el.style.transition = 'opacity 0.5s';
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 500);
+    }, 4000);
+});
+
+// ── Information Request: character counter ────────────────
+function irInitCharCounter(textareaId, counterId, minLength = 10) {
+    const textarea = document.getElementById(textareaId);
+    const counter  = document.getElementById(counterId);
+    if (!textarea || !counter) return;
+
+    function update() {
+        const len = textarea.value.trim().length;
+        counter.textContent = len + ' karakter' + (len < minLength ? ' (minimal ' + minLength + ')' : '');
+        counter.style.color = len < minLength ? '#EF4444' : '#94a3b8';
+    }
+
+    textarea.addEventListener('input', update);
+    update();
+}
+
+// ── Information Request: confirm delete ────────────────────
+function irConfirmDelete(message) {
+    return confirm(message || 'Yakin ingin menghapus permintaan ini?');
+}
+
+// ── Universal detail modal ──────────────────────────────────
 (function () {
-    const chatToggle   = document.getElementById('chatToggle');
-    const chatPopup    = document.getElementById('chatPopup');
-    const chatClose    = document.getElementById('chatClose');
-    const chatInput    = document.getElementById('chatInput');
-    const chatSend     = document.getElementById('chatSend');
-    const chatMessages = document.getElementById('chatMessages');
-    const chatTyping   = document.getElementById('chatTyping');
-    const chatBadge    = document.getElementById('chatBadge');
-    const quickReplies = document.getElementById('quickReplies');
-    const statusText   = document.querySelector('.chat-header-status');
+    const modal = document.getElementById('detailModal');
+    if (!modal) return;
 
-    if (!chatToggle) return; // Guard: kalau widget tidak ada di halaman ini, skip
-    let isOpen = false;
+    const modalImage = document.getElementById('detailModalImage');
+    const modalBadge = document.getElementById('detailModalBadge');
+    const modalTitle = document.getElementById('detailModalTitle');
+    const modalMeta = document.getElementById('detailModalMeta');
+    const modalDescription = document.getElementById('detailModalDescription');
+    const closeTargets = modal.querySelectorAll('[data-close-modal]');
 
-    // ── Toggle open/close ─────────────────────────────────────────
-    function toggleChat() {
-        isOpen = !isOpen;
-        chatToggle.classList.toggle('open', isOpen);
-        chatPopup.classList.toggle('open', isOpen);
-        if (isOpen) {
-            chatBadge.classList.add('hidden');
-            chatInput.focus();
+    function openModal(data) {
+        modal.classList.add('open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+
+        modalBadge.textContent = data.badge || '';
+        modalTitle.textContent = data.title || '';
+        modalMeta.textContent = data.meta || '';
+        modalDescription.textContent = data.description || '';
+
+        if (data.image) {
+            modalImage.src = data.image;
+            modalImage.style.display = 'block';
+            modalImage.alt = data.title || '';
+        } else {
+            modalImage.removeAttribute('src');
+            modalImage.style.display = 'none';
         }
     }
-    chatToggle.addEventListener('click', toggleChat);
-    chatClose.addEventListener('click', toggleChat);
 
-    // ── Enable/disable send button ────────────────────────────────
-    chatInput.addEventListener('input', () => {
-        chatSend.disabled = chatInput.value.trim() === '';
-    });
+    function closeModal() {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
 
-    chatInput.addEventListener('keydown', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey && chatInput.value.trim()) {
-            e.preventDefault();
-            sendMessage(chatInput.value.trim());
-        }
-    });
+    document.addEventListener('click', (e) => {
+        const card = e.target.closest('.js-detail-card');
+        if (!card) return;
 
-    chatSend.addEventListener('click', () => {
-        if (chatInput.value.trim()) sendMessage(chatInput.value.trim());
-    });
+        e.preventDefault();
 
-    // ── Quick reply buttons ───────────────────────────────────────
-    document.querySelectorAll('.chat-quick-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            sendMessage(btn.dataset.msg);
-            quickReplies.style.display = 'none';
+        openModal({
+            badge: card.dataset.badge,
+            title: card.dataset.title,
+            meta: card.dataset.meta,
+            description: card.dataset.description,
+            image: card.dataset.image
         });
     });
 
-    // ── Status AI ─────────────────────────────────────────────────
-    function setStatus(state, label = '') {
-        const dots = {
-            online  : '<span class="chat-status-dot"></span>',
-            typing  : '<span class="chat-status-dot typing"></span>',
-            offline : '<span class="chat-status-dot offline"></span>',
-        };
-        const labels = {
-            online  : label || 'Online sekarang',
-            typing  : 'Sedang mengetik...',
-            offline : label || 'Sedang tidak tersedia',
-        };
-        statusText.innerHTML = `${dots[state]} ${labels[state]}`;
-    }
+    closeTargets.forEach(btn => {
+        btn.addEventListener('click', closeModal);
+    });
 
-    async function checkAiStatus() {
-        try {
-            const res  = await fetch('/chatbot/status');
-            const data = await res.json();
-            setStatus(data.online ? 'online' : 'offline', data.label);
-        } catch {
-            setStatus('offline', 'Koneksi bermasalah');
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal.classList.contains('open')) {
+            closeModal();
         }
-    }
-    checkAiStatus();
-    setInterval(checkAiStatus, 30_000);
-
-    // ── Deteksi koneksi realtime ──────────────────────────────────
-    window.addEventListener('offline', () => setStatus('offline', 'Tidak ada koneksi'));
-    window.addEventListener('online',  () => checkAiStatus());
-
-    // ── Append pesan ──────────────────────────────────────────────
-    function addMessage(text, isUser = false) {
-        const msg = document.createElement('div');
-        msg.className = `chat-msg ${isUser ? 'chat-msg-user' : 'chat-msg-bot'}`;
-        msg.innerHTML = isUser
-            ? `<div class="chat-msg-bubble">${text}</div>`
-            : `<div class="chat-msg-avatar"><i class="fas fa-umbrella-beach"></i></div>
-               <div class="chat-msg-bubble">${text}</div>`;
-        chatMessages.appendChild(msg);
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function showTyping() {
-        chatTyping.classList.add('show');
-        setStatus('typing');
-        chatMessages.scrollTop = chatMessages.scrollHeight;
-    }
-
-    function hideTyping() {
-        chatTyping.classList.remove('show');
-        setStatus('online');
-    }
-
-    // ── Kirim pesan ───────────────────────────────────────────────
-    async function sendMessage(text) {
-        if (!text.trim()) return;
-        addMessage(text, true);
-        chatInput.value  = '';
-        chatSend.disabled = true;
-        showTyping();
-
-        // Cek CSRF token
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-        if (!csrfToken) {
-            hideTyping();
-            addMessage('⚠️ Konfigurasi halaman bermasalah. Coba refresh dulu ya!');
-            chatSend.disabled = false;
-            return;
-        }
-
-        // Cek koneksi browser
-        if (!navigator.onLine) {
-            hideTyping();
-            addMessage('⚠️ Tidak ada koneksi internet. Periksa jaringan kamu ya!');
-            chatSend.disabled = false;
-            return;
-        }
-
-        const MAX_RETRY = 2;
-        let attempt = 0;
-
-        while (attempt <= MAX_RETRY) {
-            try {
-                const controller = new AbortController();
-                const timeout    = setTimeout(() => controller.abort(), 15000);
-
-                const response = await fetch('/chatbot', {
-                    method : 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': csrfToken,
-                    },
-                    body  : JSON.stringify({ message: text }),
-                    signal: controller.signal,
-                });
-
-                clearTimeout(timeout);
-                const data = await response.json();
-                hideTyping();
-                addMessage(data.reply || 'Maaf, tidak ada respons.');
-                return;
-
-            } catch (err) {
-                attempt++;
-                if (attempt > MAX_RETRY) {
-                    hideTyping();
-                    addMessage(err.name === 'AbortError'
-                        ? '⏱️ Koneksi terlalu lama. Coba lagi nanti ya!'
-                        : '❌ Gagal terhubung ke server. Pastikan internet kamu stabil.');
-                    chatSend.disabled = false;
-                } else {
-                    await new Promise(r => setTimeout(r, attempt * 1000));
-                }
-            }
-        }
-    }
+    });
 })();

@@ -15,6 +15,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return $this->redirectAuthenticated(Auth::user());
         }
+
         return view('auth.login');
     }
 
@@ -23,10 +24,17 @@ class AuthController extends Controller
         $credentials = $request->validate([
             'email'    => ['required', 'email'],
             'password' => ['required'],
+        ], [
+            'email.required'    => 'Email wajib diisi.',
+            'email.email'       => 'Format email tidak valid.',
+            'password.required' => 'Password wajib diisi.',
         ]);
 
-        if (Auth::attempt($credentials, $request->boolean('remember'))) {
+        $remember = $request->boolean('remember');
+
+        if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
+
             return $this->redirectAuthenticated(Auth::user());
         }
 
@@ -40,6 +48,7 @@ class AuthController extends Controller
         if (Auth::check()) {
             return $this->redirectAuthenticated(Auth::user());
         }
+
         return view('auth.register');
     }
 
@@ -47,16 +56,20 @@ class AuthController extends Controller
     {
         $validated = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users'],
+            'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::min(8)],
         ], [
-            'name.required'      => 'Nama lengkap wajib diisi.',
-            'email.required'     => 'Email wajib diisi.',
-            'email.email'        => 'Format email tidak valid.',
-            'email.unique'       => 'Email ini sudah terdaftar.',
-            'password.required'  => 'Password wajib diisi.',
-            'password.confirmed' => 'Konfirmasi password tidak cocok.',
-            'password.min'       => 'Password minimal 8 karakter.',
+            'name.required'              => 'Nama lengkap wajib diisi.',
+            'name.string'                => 'Nama lengkap tidak valid.',
+            'name.max'                   => 'Nama lengkap maksimal 255 karakter.',
+            'email.required'             => 'Email wajib diisi.',
+            'email.string'               => 'Email tidak valid.',
+            'email.email'                => 'Format email tidak valid.',
+            'email.max'                  => 'Email maksimal 255 karakter.',
+            'email.unique'               => 'Email ini sudah terdaftar.',
+            'password.required'          => 'Password wajib diisi.',
+            'password.confirmed'         => 'Konfirmasi password tidak cocok.',
+            'password.min'               => 'Password minimal 8 karakter.',
         ]);
 
         $user = User::create([
@@ -67,17 +80,20 @@ class AuthController extends Controller
         ]);
 
         Auth::login($user);
+        $request->session()->regenerate();
 
         return redirect()
-            ->route('reviews.create')
+            ->intended(route('home'))
             ->with('success', 'Akun berhasil dibuat! Selamat datang, ' . $user->name . '.');
     }
 
     public function logout(Request $request)
     {
         Auth::logout();
+
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+
         return redirect()->route('home');
     }
 
@@ -86,6 +102,7 @@ class AuthController extends Controller
         if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');
         }
-        return redirect()->route('reviews.create');
+
+        return redirect()->intended(route('home'));
     }
 }

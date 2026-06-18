@@ -22,14 +22,6 @@
         value="{{ old('subtitle', $banner?->subtitle ?? '') }}">
 </div>
 
-{{-- URL --}}
-<div class="mb-3">
-    <label class="form-label">URL</label>
-    <input type="url" name="url" class="form-control"
-        value="{{ old('url', $banner?->url ?? '') }}">
-    <small class="text-muted">Link when banner is clicked (optional)</small>
-</div>
-
 {{-- Image --}}
 <div class="mb-3">
     <label class="form-label">Image</label>
@@ -37,11 +29,11 @@
         class="form-control" accept="image/*"
         {{ $banner ? '' : 'required' }}>
     <div id="imagePreview" class="mt-2"
-        style="{{ $banner?->image_path ? '' : 'display:none;' }}">
+        style="{{ $banner?->media ? '' : 'display:none;' }}">
         <img id="imagePreviewImg"
-            src="{{ $banner?->image_path ? asset('storage/'.$banner->image_path) : '#' }}"
+            src="{{ $banner?->media?->url ?? '#' }}"
             width="200" class="img-thumbnail">
-        @if($banner?->image_path)
+        @if($banner?->media)
             <small class="d-block text-muted mt-1">Upload foto baru untuk mengganti.</small>
         @endif
     </div>

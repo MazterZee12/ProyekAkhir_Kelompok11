@@ -20,7 +20,7 @@
                 <i class="fas fa-bars"></i>
             </button>
             <span class="navbar-brand mb-0">
-                <i class="fas fa-umbrella-beach me-2"></i>Pasir Putih Toba
+                <i class="fas fa-umbrella-beach me-2"></i>Pasir Putih Parparean
             </span>
         </div>
         <!-- THEME SWITCHER -->
@@ -145,18 +145,14 @@
                     <span class="nav-text">Profil</span>
                 </a>
             </li>
+
             <li class="nav-item">
                 <a href="{{ route('admin.contacts.index') }}" class="nav-link {{ request()->routeIs('admin.contacts.*') ? 'active' : '' }}">
                     <i class="fas fa-address-card"></i>
                     <span class="nav-text">Kontak & Lokasi</span>
                 </a>
             </li>
-            <li class="nav-item">
-                <a href="{{ route('admin.schedules.index') }}" class="nav-link {{ request()->routeIs('admin.schedules.*') ? 'active' : '' }}">
-                    <i class="fas fa-calendar-alt"></i>
-                    <span class="nav-text">Jadwal & Kunjungan</span>
-                </a>
-            </li>
+
             <li class="nav-item">
                 <a href="{{ route('admin.faqs.index') }}" class="nav-link {{ request()->routeIs('admin.faqs.*') ? 'active' : '' }}">
                     <i class="fas fa-question-circle"></i>
@@ -168,22 +164,17 @@
         <div class="sidebar-section-label">Pengguna</div>
         <ul class="nav flex-column">
             <li class="nav-item">
-                @php
-                    $reportedCount = \App\Models\Review::where('reports_count', '>=', 5)
-                        ->where('is_hidden', false)
-                        ->count();
-                @endphp
-                <a href="{{ route('admin.reviews.index') }}"
-                    class="nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.reviews.index') }}" class="nav-link {{ request()->routeIs('admin.reviews.*') ? 'active' : '' }}">
                     <i class="fas fa-star"></i>
-                    <span class="nav-text d-flex align-items-center gap-2">
-                        Ulasan
-                        @if($reportedCount > 0)
-                            <span class="badge bg-danger" style="font-size:0.6rem;padding:3px 6px;">
-                                {{ $reportedCount }}
-                            </span>
-                        @endif
-                    </span>
+                    <span class="nav-text">Ulasan</span>
+                </a>
+            </li>
+        </ul>
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a href="{{ route('admin.information-requests.index') }}" class="nav-link {{ request()->routeIs('admin.information-requests.*') ? 'active' : '' }}">
+                    <i class="fas fa-question-circle"></i>
+                    <span class="nav-text">Permintaan Informasi</span>
                 </a>
             </li>
         </ul>

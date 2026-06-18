@@ -41,44 +41,26 @@
                     </td>
                 </tr>
                 <tr>
-                    <th>Jumlah Laporan</th>
-                    <td>
-                        @if($review->reports_count > 0)
-                            <span class="badge bg-danger">{{ $review->reports_count }}x dilaporkan</span>
-                        @else
-                            <span class="text-muted">Belum ada laporan</span>
-                        @endif
-                    </td>
+                    <th>Tanggal Kunjungan</th>
+                    <td>{{ \Carbon\Carbon::parse($review->visit_date)->format('d M Y') }}</td>
                 </tr>
-                @if($review->report_reasons)
                 <tr>
-                    <th>Alasan Laporan</th>
-                    <td>
-                        @php
-                            $reasonCounts = array_count_values($review->report_reasons);
-                        @endphp
-                        @foreach($reasonCounts as $reason => $count)
-                            <span class="badge bg-warning text-dark me-1">
-                                {{ $reason }} @if($count > 1)({{ $count }}x)@endif
-                            </span>
-                        @endforeach
-                    </td>
-                </tr>
-                @endif
-                <tr>
-                    <th>Tanggal</th>
-                    <td>{{ $review->created_at->format('d M Y, H:i') }}</td>
+                    <th>Tanggal Diulas</th>
+                    <td>{{ $review->created_at->format('d M Y, H:i') }} WIB</td>
                 </tr>
             </table>
 
             <div class="mt-3 d-flex gap-2">
-                @if($review->is_hidden)
-                    <form action="{{ route('admin.reviews.unhide', $review) }}" method="POST">
-                        @csrf
-                        @method('PATCH')
+                <form action="{{ route('admin.reviews.toggleVisibility', $review) }}" method="POST">
+                    @csrf
+                    @method('PATCH')
+                    @if($review->is_hidden)
                         <button class="btn btn-success">Tampilkan Kembali</button>
-                    </form>
-                @endif
+                    @else
+                        <button class="btn btn-secondary">Sembunyikan</button>
+                    @endif
+                </form>
+
                 <button type="button" class="btn btn-danger"
                     data-bs-toggle="modal" data-bs-target="#deleteModal"
                     data-id="{{ $review->id }}"
@@ -88,7 +70,6 @@
             </div>
         </div>
     </div>
-
 </div>
 
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
@@ -113,7 +94,6 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')

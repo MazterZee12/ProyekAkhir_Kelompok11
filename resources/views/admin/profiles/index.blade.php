@@ -1,4 +1,5 @@
 @extends('layouts.admin')
+
 @section('content')
 <div class="container">
 
@@ -13,7 +14,7 @@
                 <thead>
                     <tr>
                         <th width="50">#</th>
-                        <th width="100">Logo</th>
+                        <th width="100">Photo</th>
                         <th>Name</th>
                         <th width="110">Established</th>
                         <th width="90">Status</th>
@@ -25,9 +26,11 @@
                     <tr>
                         <td>{{ $profiles->firstItem() + $loop->index }}</td>
                         <td>
-                            @if($profile->logo_path)
-                                <img src="{{ asset('storage/'.$profile->logo_path) }}"
-                                    width="80" class="img-thumbnail">
+                            @if($profile->media)
+                                <img src="{{ $profile->media->url }}"
+                                    width="80"
+                                    class="img-thumbnail"
+                                    alt="{{ $profile->name }}">
                             @else
                                 <span class="text-muted">-</span>
                             @endif
@@ -61,6 +64,7 @@
                 @endforelse
                 </tbody>
             </table>
+
             <div class="mt-3">{{ $profiles->links() }}</div>
         </div>
     </div>
@@ -90,15 +94,19 @@
         </div>
     </div>
 </div>
-
 @endsection
 
 @push('scripts')
 <script>
-document.getElementById('deleteModal').addEventListener('show.bs.modal', function (e) {
-    const btn = e.relatedTarget;
-    document.getElementById('deleteProfileTitle').textContent = btn.getAttribute('data-title');
-    document.getElementById('deleteForm').action = '/admin/profiles/' + btn.getAttribute('data-id');
+document.addEventListener('DOMContentLoaded', function () {
+    const deleteModal = document.getElementById('deleteModal');
+    if (!deleteModal) return;
+
+    deleteModal.addEventListener('show.bs.modal', function (e) {
+        const btn = e.relatedTarget;
+        document.getElementById('deleteProfileTitle').textContent = btn.getAttribute('data-title');
+        document.getElementById('deleteForm').action = '/admin/profiles/' + btn.getAttribute('data-id');
+    });
 });
 </script>
 @endpush

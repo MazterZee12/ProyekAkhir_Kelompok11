@@ -26,10 +26,10 @@
                         <td>{{ $galleries->firstItem() + $loop->index }}</td>
                         <td>
                             @if($gallery->type == 'photo')
-                                <img src="{{ $gallery->file_url }}" width="80" class="img-thumbnail">
+                                <img src="{{ $gallery->media->url }}" width="80" class="img-thumbnail">
                             @else
                                 <video width="80">
-                                    <source src="{{ $gallery->file_url }}">
+                                    <source src="{{ $gallery->media->url }}">
                                 </video>
                             @endif
                         </td>
