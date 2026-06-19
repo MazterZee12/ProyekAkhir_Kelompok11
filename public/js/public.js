@@ -157,10 +157,11 @@ function openLightbox(src, title) {
     const lb  = document.getElementById('lightbox');
     const img = document.getElementById('lightbox-img');
     const cap = document.getElementById('lightbox-caption');
-    if (!lb) return;
-    img.src = src;
-    img.style.display = 'block';
-    cap.textContent = title || '';
+    if (!lb || !img) return;
+
+    img.src                      = src;
+    img.style.display            = 'block';
+    cap.textContent              = title || '';
     lb.classList.add('open');
     document.body.style.overflow = 'hidden';
 }
@@ -172,20 +173,24 @@ function closeLightbox() {
     document.body.style.overflow = '';
 }
 
-document.addEventListener('keydown', e => {
-    if (e.key === 'Escape') closeLightbox();
+// Tombol close lightbox
+document.getElementById('lightboxClose')?.addEventListener('click', closeLightbox);
+
+// Klik backdrop lightbox
+document.getElementById('lightbox')?.addEventListener('click', function (e) {
+    if (e.target === this) closeLightbox();
 });
 
 // ── Alert auto-dismiss ─────────────────────────────────────
 document.querySelectorAll('.js-alert').forEach(el => {
     setTimeout(() => {
         el.style.transition = 'opacity 0.5s';
-        el.style.opacity = '0';
+        el.style.opacity    = '0';
         setTimeout(() => el.remove(), 500);
     }, 4000);
 });
 
-// ── Information Request: character counter ────────────────
+// ── Information Request: character counter ─────────────────
 function irInitCharCounter(textareaId, counterId, minLength = 10) {
     const textarea = document.getElementById(textareaId);
     const counter  = document.getElementById(counterId);
@@ -206,32 +211,94 @@ function irConfirmDelete(message) {
     return confirm(message || 'Yakin ingin menghapus permintaan ini?');
 }
 
-// ── Universal detail modal ──────────────────────────────────
+// ── Chatbot status check ───────────────────────────────────
+const statusEl = document.querySelector('.chat-header-status');
+
+function setStatus(state, label = '') {
+    if (!statusEl) return;
+    const dotClass = {
+        online  : 'chat-status-dot',
+        typing  : 'chat-status-dot typing',
+        offline : 'chat-status-dot offline',
+    };
+    const text = {
+        online  : label || 'Online sekarang',
+        typing  : 'Sedang mengetik...',
+        offline : label || 'Sedang tidak tersedia',
+    };
+    statusEl.innerHTML = `<span class="${dotClass[state]}"></span>${text[state]}`;
+}
+
+async function checkAiStatus() {
+    try {
+        const res = await fetch('/chatbot/status');
+
+        if (!res.ok) {
+            setStatus('offline', 'Server bermasalah');
+            return;
+        }
+
+        const data = await res.json();
+        setStatus(data.online ? 'online' : 'offline', data.label ?? '');
+
+    } catch {
+        setStatus('offline', 'Koneksi bermasalah');
+    }
+}
+
+if (statusEl) {
+    checkAiStatus();
+    setInterval(checkAiStatus, 30_000);
+    window.addEventListener('offline', () => setStatus('offline', 'Tidak ada koneksi'));
+    window.addEventListener('online',  () => checkAiStatus());
+}
+
+// ── Keyboard: Escape tutup semua overlay ───────────────────
+document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+
+    // Lightbox
+    const lb = document.getElementById('lightbox');
+    if (lb?.classList.contains('open')) {
+        closeLightbox();
+        return;
+    }
+
+    // Detail modal
+    const modal = document.getElementById('detailModal');
+    if (modal?.classList.contains('open')) {
+        modal.classList.remove('open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+});
+
+// ── Universal detail modal ─────────────────────────────────
 (function () {
     const modal = document.getElementById('detailModal');
     if (!modal) return;
 
-    const modalImage = document.getElementById('detailModalImage');
-    const modalBadge = document.getElementById('detailModalBadge');
-    const modalTitle = document.getElementById('detailModalTitle');
-    const modalMeta = document.getElementById('detailModalMeta');
+    const modalImage       = document.getElementById('detailModalImage');
+    const modalBadge       = document.getElementById('detailModalBadge');
+    const modalTitle       = document.getElementById('detailModalTitle');
+    const modalMeta        = document.getElementById('detailModalMeta');
     const modalDescription = document.getElementById('detailModalDescription');
-    const closeTargets = modal.querySelectorAll('[data-close-modal]');
+    const closeTargets     = modal.querySelectorAll('[data-close-modal]');
 
     function openModal(data) {
         modal.classList.add('open');
         modal.setAttribute('aria-hidden', 'false');
         document.body.style.overflow = 'hidden';
 
-        modalBadge.textContent = data.badge || '';
-        modalTitle.textContent = data.title || '';
-        modalMeta.textContent = data.meta || '';
+        modalBadge.textContent       = data.badge || '';
+        modalTitle.textContent       = data.title || '';
+        modalMeta.textContent        = data.meta  || '';
         modalDescription.textContent = data.description || '';
 
         if (data.image) {
-            modalImage.src = data.image;
+            modalImage.src           = data.image;
             modalImage.style.display = 'block';
-            modalImage.alt = data.title || '';
+            modalImage.alt           = data.title || '';
         } else {
             modalImage.removeAttribute('src');
             modalImage.style.display = 'none';
@@ -247,25 +314,23 @@ function irConfirmDelete(message) {
     document.addEventListener('click', (e) => {
         const card = e.target.closest('.js-detail-card');
         if (!card) return;
-
         e.preventDefault();
 
+        // Galeri → lightbox
+        if (card.dataset.detailType === 'gallery' && card.dataset.image) {
+            openLightbox(card.dataset.image, card.dataset.title);
+            return;
+        }
+
+        // Lainnya → detail modal
         openModal({
-            badge: card.dataset.badge,
-            title: card.dataset.title,
-            meta: card.dataset.meta,
+            badge      : card.dataset.badge,
+            title      : card.dataset.title,
+            meta       : card.dataset.meta,
             description: card.dataset.description,
-            image: card.dataset.image
+            image      : card.dataset.image,
         });
     });
 
-    closeTargets.forEach(btn => {
-        btn.addEventListener('click', closeModal);
-    });
-
-    document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && modal.classList.contains('open')) {
-            closeModal();
-        }
-    });
+    closeTargets.forEach(btn => btn.addEventListener('click', closeModal));
 })();

@@ -6,19 +6,15 @@
 <section class="hero" id="heroCarousel">
 
     @if($heroBanners->count())
-
         @foreach($heroBanners as $i => $banner)
             <div class="hero-slide {{ $i === 0 ? 'active' : '' }}"
                 style="background-image:url('{{ $banner->media?->url ?? 'https://tourismdanautoba.site/image/Pantai%20Pasir%20Putih%20Parparean.jpg' }}')">
             </div>
         @endforeach
-
     @else
-
         <div class="hero-slide active"
             style="background-image:url('https://tourismdanautoba.site/image/Pantai%20Pasir%20Putih%20Parparean.jpg')">
         </div>
-
     @endif
 
     <div class="hero-bg-overlay"></div>
@@ -26,107 +22,56 @@
     <div class="hero-content">
 
         @if($heroBanners->count())
-
             @foreach($heroBanners as $i => $banner)
                 <div class="hero-text {{ $i === 0 ? 'active' : '' }}">
-
                     <div class="hero-center">
-
-                        <div class="hero-eyebrow">
-                            Danau Toba, Sumatera Utara
-                        </div>
-
+                        <div class="hero-eyebrow">Danau Toba, Sumatera Utara</div>
                         <h1>{{ $banner->title }}</h1>
-
                         @if($banner->subtitle)
                             <p>{{ $banner->subtitle }}</p>
                         @endif
-
                     </div>
-
                     <div class="hero-btns-corner">
-                        <a href="#gallery" class="btn-primary-hero">
-                            Jelajahi Sekarang
-                        </a>
-
-                        <a href="#facilities" class="btn-outline-hero">
-                            Lihat Fasilitas
-                        </a>
+                        <a href="#gallery" class="btn-primary-hero">Jelajahi Sekarang</a>
+                        <a href="#facilities" class="btn-outline-hero">Lihat Fasilitas</a>
                     </div>
-
                 </div>
             @endforeach
-
         @else
-
-            {{-- FALLBACK HERO TANPA PROFILE --}}
-
             <div class="hero-text active">
-
                 <div class="hero-center">
-
-                    <div class="hero-eyebrow">
-                        Danau Toba, Sumatera Utara
-                    </div>
-
-                    <h1>
-                        Pantai Pasir Putih
-                        <em>Parparean</em>
-                    </h1>
-
-                    <p>
-                        Nikmati hamparan pasir putih yang luas,
-                        panorama Danau Toba yang menenangkan,
-                        serta berbagai fasilitas wisata yang nyaman
-                        untuk keluarga maupun rombongan.
-                    </p>
-
+                    <div class="hero-eyebrow">Danau Toba, Sumatera Utara</div>
+                    <h1>Pantai Pasir Putih <em>Parparean</em></h1>
+                    <p>Nikmati hamparan pasir putih yang luas, panorama Danau Toba yang menenangkan, serta berbagai fasilitas wisata yang nyaman untuk keluarga maupun rombongan.</p>
                 </div>
-
                 <div class="hero-btns-corner">
-
-                    <a href="#gallery" class="btn-primary-hero">
-                        Jelajahi Sekarang
-                    </a>
-
-                    <a href="#facilities" class="btn-outline-hero">
-                        Lihat Fasilitas
-                    </a>
-
+                    <a href="#gallery" class="btn-primary-hero">Jelajahi Sekarang</a>
+                    <a href="#facilities" class="btn-outline-hero">Lihat Fasilitas</a>
                 </div>
-
             </div>
-
         @endif
 
     </div>
 
     @if($heroBanners->count() > 1)
-
         <div class="hero-dots">
             @foreach($heroBanners as $i => $banner)
-                <button
-                    class="hero-dot {{ $i === 0 ? 'active' : '' }}">
-                </button>
+                <button class="hero-dot {{ $i === 0 ? 'active' : '' }}"></button>
             @endforeach
         </div>
-
         <button class="hero-arrow hero-prev" id="heroPrev">
             <i class="fas fa-chevron-left"></i>
         </button>
-
         <button class="hero-arrow hero-next" id="heroNext">
             <i class="fas fa-chevron-right"></i>
         </button>
-
     @endif
 
-    <div class="hero-scroll">
-        Scroll
-    </div>
+    <div class="hero-scroll">Scroll</div>
 
 </section>
-{{-- FEATURES — WHITE --}}
+
+{{-- FEATURES --}}
 <section class="features">
     <div class="features-grid">
         <div class="feature-item reveal">
@@ -152,7 +97,7 @@
     </div>
 </section>
 
-{{-- ABOUT — TINT --}}
+{{-- ABOUT --}}
 <section class="about" id="about">
     <div class="about-image reveal">
         <img
@@ -162,14 +107,12 @@
     <div class="about-content reveal">
         <div class="section-label">Tentang Kami</div>
         <h2>Kenalan Lebih Dekat dengan Pasir Putih Parparean</h2>
-
         @if($profile)
             <p>{{ $profile->history }}</p>
             <p>{{ $profile->vision }}</p>
         @else
             <p>Pasir Putih Parparean jadi salah satu spot favorit di pinggir Danau Toba — pantainya berpasir putih, airnya tenang, dan pemandangannya bikin betah berlama-lama.</p>
         @endif
-
         <div class="about-stats">
             <div class="stat-item"><h3>5K+</h3><p>Pengunjung / Bulan</p></div>
             <div class="stat-item"><h3>{{ number_format($avgRating, 1) }}</h3><p>Rating Rata-rata</p></div>
@@ -178,7 +121,7 @@
     </div>
 </section>
 
-{{-- GALLERY — CREAM --}}
+{{-- GALLERY --}}
 <section class="gallery-section" id="gallery">
     <div class="gallery-header-top">
         <div>
@@ -196,7 +139,7 @@
                 data-detail-type="gallery"
                 data-title="{{ $gallery->title ?? 'Galeri' }}"
                 data-badge="Galeri"
-                data-meta="Klik untuk melihat detail"
+                data-meta="{{ $gallery->title ?? '' }}"
                 data-description="{{ e($gallery->description ?? 'Tidak ada deskripsi.') }}"
                 data-image="{{ $gallery->media?->url ?? 'https://via.placeholder.com/800x600?text=Galeri' }}"
             >
@@ -212,7 +155,7 @@
     </div>
 </section>
 
-{{-- FACILITIES — WHITE --}}
+{{-- FACILITIES --}}
 <section class="facilities-section" id="facilities">
     <div class="facilities-header reveal">
         <div>
@@ -252,7 +195,7 @@
     </div>
 </section>
 
-{{-- PRICING — TINT --}}
+{{-- PRICING --}}
 <section class="pricing-section" id="pricing">
     <div class="pricing-header reveal">
         <div class="section-label">Tiket Masuk</div>
@@ -270,7 +213,7 @@
                 data-badge="Harga Tiket"
                 data-meta="{{ $price->formatted_amount }}"
                 data-description="{{ e($price->notes ?? 'Tidak ada keterangan tambahan.') }}"
-                data-image="{{ $price->media?->url ?? 'https://via.placeholder.com/800x600?text=Harga' }}"
+                data-image=""
             >
                 <h4>{{ $price->unit }}</h4>
                 <div class="price-amount">{{ number_format($price->amount / 1000, 0) }}K</div>
@@ -288,7 +231,7 @@
     </div>
 </section>
 
-{{-- ANNOUNCEMENTS — CREAM --}}
+{{-- ANNOUNCEMENTS --}}
 <section class="announcements-section" id="announcements">
     <div class="announcements-header reveal">
         <div>
@@ -300,39 +243,34 @@
 
     <div class="announcements-grid">
         @forelse($announcements->take(3) as $announcement)
-            <button
-                type="button"
-                class="announcement-card reveal js-detail-card"
-                data-detail-type="announcement"
-                data-title="{{ $announcement->title }}"
-                data-badge="{{ ucfirst($announcement->type) }}"
-                data-meta="{{ $announcement->created_at->format('d M Y') }}"
-                data-description="{{ e($announcement->content ?? 'Tidak ada isi pengumuman.') }}"
-                data-image="{{ $announcement->photo?->url ?? 'https://via.placeholder.com/800x600?text=Pengumuman' }}"
-            >
-                <div class="announcement-img">
+            <a href="{{ route('public.announcements.show', $announcement->id) }}"
+               class="ann-card reveal">
+                <div class="ann-img">
                     @if($announcement->photo)
                         <img src="{{ $announcement->photo->url }}" alt="{{ $announcement->title }}">
                     @else
                         <i class="fas fa-{{ $announcement->type === 'event' ? 'calendar' : ($announcement->type === 'promo' ? 'tags' : 'info-circle') }}" style="font-size:2.5rem;opacity:0.4;"></i>
                     @endif
+                    <span class="ann-type-badge ann-type-{{ $announcement->type }}">
+                        {{ ucfirst($announcement->type) }}
+                    </span>
                 </div>
-                <div class="announcement-body">
-                    <div class="announcement-type">{{ ucfirst($announcement->type) }}</div>
-                    <h4>{{ $announcement->title }}</h4>
-                    <p>{{ \Illuminate\Support\Str::limit($announcement->content, 100) }}</p>
-                    <div class="announcement-date">
-                        <i class="far fa-calendar"></i> {{ $announcement->created_at->format('d M Y') }}
+                <div class="ann-body">
+                    <div class="ann-meta" style="font-size:0.72rem;color:var(--text-light);margin-bottom:8px;display:flex;align-items:center;gap:6px;">
+                        <i class="far fa-calendar" style="color:var(--accent);"></i>
+                        {{ $announcement->created_at->format('d M Y') }}
                     </div>
+                    <h4>{{ $announcement->title }}</h4>
+                    <p>{{ \Illuminate\Support\Str::limit(strip_tags($announcement->content), 100) }}</p>
                 </div>
-            </button>
+            </a>
         @empty
             <p style="color:var(--text-gray);">Belum ada pengumuman.</p>
         @endforelse
     </div>
 </section>
 
-{{-- REVIEWS — WHITE --}}
+{{-- REVIEWS --}}
 <section class="reviews-section" id="reviews">
     <div class="reviews-header reveal">
         <div class="section-label">Ulasan</div>
@@ -397,7 +335,7 @@
     @endauth
 </section>
 
-{{-- CTA — DARK --}}
+{{-- CTA --}}
 <section class="cta-section">
     <div class="cta-bg" style="background-image:url('https://www.itrip.id/wp-content/uploads/2023/10/Alamat-Pantai-Pasir-Putih-Parparean.webp')"></div>
     <div class="cta-content reveal">
@@ -408,19 +346,27 @@
     </div>
 </section>
 
+{{-- LIGHTBOX GALERI --}}
+<div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose">
+        <i class="fas fa-times"></i>
+    </button>
+    <div class="lightbox-inner">
+        <img id="lightbox-img" src="" alt="" style="display:none;">
+        <p id="lightbox-caption"></p>
+    </div>
+</div>
+
 {{-- UNIVERSAL DETAIL MODAL --}}
 <div class="detail-modal" id="detailModal" aria-hidden="true">
     <div class="detail-modal-backdrop" data-close-modal></div>
-
     <div class="detail-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="detailModalTitle">
         <button type="button" class="detail-modal-close" data-close-modal>
             <i class="fas fa-times"></i>
         </button>
-
         <div class="detail-modal-image-wrap">
-            <img id="detailModalImage" alt="">
+            <img id="detailModalImage" alt="" style="display:none;">
         </div>
-
         <div class="detail-modal-body">
             <div class="detail-modal-badge" id="detailModalBadge"></div>
             <h3 id="detailModalTitle"></h3>

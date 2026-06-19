@@ -1,7 +1,5 @@
 @extends('layouts.auth')
-
 @section('title', 'Masuk — Pasir Putih Parparean')
-
 @section('content')
 <div class="login-wrapper">
 
@@ -57,19 +55,17 @@
 
             @if(session('error'))
                 <div class="login-alert login-alert-error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    {{ session('error') }}
+                    <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
                 </div>
             @endif
 
             @if(session('success'))
                 <div class="login-alert login-alert-success">
-                    <i class="fas fa-check-circle"></i>
-                    {{ session('success') }}
+                    <i class="fas fa-check-circle"></i> {{ session('success') }}
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('login.post') }}" class="login-form">
+            <form method="POST" action="{{ route('login.post') }}" class="login-form" id="loginForm">
                 @csrf
 
                 <div class="form-group {{ $errors->has('email') ? 'has-error' : '' }}">
@@ -89,7 +85,12 @@
                 </div>
 
                 <div class="form-group {{ $errors->has('password') ? 'has-error' : '' }}">
-                    <label for="password">Password</label>
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <label for="password">Password</label>
+                        <a href="{{ route('password.request') }}" class="forgot-link">
+                            Lupa password?
+                        </a>
+                    </div>
                     <div class="input-wrapper">
                         <i class="fas fa-lock input-icon"></i>
                         <input type="password" name="password" id="password"
@@ -121,33 +122,14 @@
                 </button>
             </form>
 
-            <div class="login-divider">
-                <span>atau</span>
-            </div>
+            <div class="login-divider"><span>atau</span></div>
 
             <a href="{{ route('register') }}" class="btn-register-alt">
-                <i class="fas fa-user-plus"></i>
-                Buat Akun Baru
+                <i class="fas fa-user-plus"></i> Buat Akun Baru
             </a>
+
         </div>
     </div>
 
 </div>
 @endsection
-
-
-
-@push('scripts')
-<script>
-const toggleBtn     = document.getElementById('togglePassword');
-const passwordInput = document.getElementById('password');
-const eyeIcon       = document.getElementById('eyeIcon');
-if (toggleBtn && passwordInput) {
-    toggleBtn.addEventListener('click', () => {
-        const isPassword = passwordInput.type === 'password';
-        passwordInput.type = isPassword ? 'text' : 'password';
-        eyeIcon.className  = isPassword ? 'fas fa-eye-slash' : 'fas fa-eye';
-    });
-}
-</script>
-@endpush
