@@ -107,9 +107,12 @@
     </div>
 </footer>
 
-<script src="{{ asset('js/public.js') }}"></script>
-<script src="{{ asset('js/chatbot.js') }}" defer></script>
+{{-- ✅ FIX 1: HTML chatbot harus di-render SEBELUM script dijalankan --}}
 @include('public.partials._chatbot')
+
+<script src="{{ asset('js/public.js') }}"></script>
+{{-- ✅ FIX 2: Hapus 'defer' agar chatbot.js jalan setelah DOM siap --}}
+<script src="{{ asset('js/chatbot.js') }}"></script>
 @stack('scripts')
 </body>
 </html>

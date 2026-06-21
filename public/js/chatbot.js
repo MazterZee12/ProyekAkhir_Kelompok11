@@ -181,3 +181,80 @@ async function sendMessage(text) {
         }
     }
 }
+
+// ===================================================
+// Resize
+// ===================================================
+const resizeHandle = document.getElementById('chatResizeHandle');
+
+const isMobile = () => window.innerWidth <= 480;
+
+function getPoint(e) {
+    return e.touches ? e.touches[0] : e;
+}
+
+let isResizing = false;
+let resizeStartX = 0;
+let resizeStartY = 0;
+let resizeStartWidth = 0;
+let resizeStartHeight = 0;
+
+function startResize(e) {
+    if (isMobile()) return;
+    isResizing = true;
+    chatPopup.classList.add('no-transition');
+
+    const rect = chatPopup.getBoundingClientRect();
+    const point = getPoint(e);
+
+    resizeStartX = point.clientX;
+    resizeStartY = point.clientY;
+    resizeStartWidth  = rect.width;
+    resizeStartHeight = rect.height;
+
+    document.addEventListener('mousemove', onResize);
+    document.addEventListener('mouseup', stopResize);
+    document.addEventListener('touchmove', onResize, { passive: false });
+    document.addEventListener('touchend', stopResize);
+
+    e.preventDefault();
+    e.stopPropagation();
+}
+
+function onResize(e) {
+    if (!isResizing) return;
+    e.preventDefault();
+
+    const point = getPoint(e);
+    // Handle ada di kiri-atas, jadi gerak ke kiri/atas = membesar
+    const dx = resizeStartX - point.clientX;
+    const dy = resizeStartY - point.clientY;
+
+    let newWidth  = resizeStartWidth + dx;
+    let newHeight = resizeStartHeight + dy;
+
+    newWidth  = Math.max(300, Math.min(newWidth, window.innerWidth * 0.9));
+    newHeight = Math.max(380, Math.min(newHeight, window.innerHeight * 0.85));
+
+    chatPopup.style.width  = newWidth + 'px';
+    chatPopup.style.height = newHeight + 'px';
+}
+
+function stopResize() {
+    isResizing = false;
+    chatPopup.classList.remove('no-transition');
+    document.removeEventListener('mousemove', onResize);
+    document.removeEventListener('mouseup', stopResize);
+    document.removeEventListener('touchmove', onResize);
+    document.removeEventListener('touchend', stopResize);
+}
+
+resizeHandle.addEventListener('mousedown', startResize);
+resizeHandle.addEventListener('touchstart', startResize, { passive: false });
+
+window.addEventListener('resize', () => {
+    if (isMobile()) {
+        chatPopup.style.width = '';
+        chatPopup.style.height = '';
+    }
+});

@@ -66,7 +66,7 @@
                     </div>
                     <p class="new-password-hint">
                         Salin password di atas lalu klik <strong>Masuk Sekarang</strong>.
-                        Kamu akan langsung diarahkan untuk mengganti password.
+                        Setelah login, kamu akan langsung diarahkan untuk mengganti password.
                     </p>
                     <a href="{{ route('login') }}" class="btn-login" style="margin-top:8px">
                         <span class="btn-text">Masuk Sekarang</span>

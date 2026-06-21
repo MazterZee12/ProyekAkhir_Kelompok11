@@ -211,48 +211,6 @@ function irConfirmDelete(message) {
     return confirm(message || 'Yakin ingin menghapus permintaan ini?');
 }
 
-// ── Chatbot status check ───────────────────────────────────
-const statusEl = document.querySelector('.chat-header-status');
-
-function setStatus(state, label = '') {
-    if (!statusEl) return;
-    const dotClass = {
-        online  : 'chat-status-dot',
-        typing  : 'chat-status-dot typing',
-        offline : 'chat-status-dot offline',
-    };
-    const text = {
-        online  : label || 'Online sekarang',
-        typing  : 'Sedang mengetik...',
-        offline : label || 'Sedang tidak tersedia',
-    };
-    statusEl.innerHTML = `<span class="${dotClass[state]}"></span>${text[state]}`;
-}
-
-async function checkAiStatus() {
-    try {
-        const res = await fetch('/chatbot/status');
-
-        if (!res.ok) {
-            setStatus('offline', 'Server bermasalah');
-            return;
-        }
-
-        const data = await res.json();
-        setStatus(data.online ? 'online' : 'offline', data.label ?? '');
-
-    } catch {
-        setStatus('offline', 'Koneksi bermasalah');
-    }
-}
-
-if (statusEl) {
-    checkAiStatus();
-    setInterval(checkAiStatus, 30_000);
-    window.addEventListener('offline', () => setStatus('offline', 'Tidak ada koneksi'));
-    window.addEventListener('online',  () => checkAiStatus());
-}
-
 // ── Keyboard: Escape tutup semua overlay ───────────────────
 document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
@@ -334,3 +292,7 @@ document.addEventListener('keydown', e => {
 
     closeTargets.forEach(btn => btn.addEventListener('click', closeModal));
 })();
+
+// ── ✅ NOTE: statusEl, setStatus, checkAiStatus DIHAPUS dari sini ──
+// Semua logika status chatbot sudah ada di chatbot.js
+// Duplikasi const di global scope menyebabkan JS error dan chatbot tidak muncul

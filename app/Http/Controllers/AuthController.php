@@ -36,13 +36,15 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            // Jika baru reset password, redirect ke ganti password
-            if ($request->session()->pull('force_change_password')) {
+            $user = Auth::user();
+
+            // Cek flag dari DB (bukan session, supaya tidak hilang saat regenerate)
+            if ($user->must_change_password) {
                 return redirect()->route('password.change')
                     ->with('info', 'Kamu menggunakan password sementara. Silakan ganti sekarang.');
             }
 
-            return $this->redirectAuthenticated(Auth::user());
+            return $this->redirectAuthenticated($user);
         }
 
         return back()
@@ -82,10 +84,11 @@ class AuthController extends Controller
 
         try {
             $user = User::create([
-                'name'     => $validated['name'],
-                'email'    => $validated['email'],
-                'password' => Hash::make($validated['password']),
-                'role'     => 'user',
+                'name'                 => $validated['name'],
+                'email'                => $validated['email'],
+                'password'             => Hash::make($validated['password']),
+                'role'                 => 'user',
+                'must_change_password' => false,
             ]);
 
             Auth::login($user);
@@ -143,12 +146,11 @@ class AuthController extends Controller
         try {
             $newPassword = Str::random(8);
 
+            // Simpan flag di DB supaya tidak hilang saat session regenerate setelah login
             $user->update([
-                'password' => Hash::make($newPassword),
+                'password'             => Hash::make($newPassword),
+                'must_change_password' => true,
             ]);
-
-            // Flag: setelah login nanti redirect ke ganti password
-            session(['force_change_password' => true]);
 
             return back()->with('new_password', $newPassword);
 
@@ -186,7 +188,8 @@ class AuthController extends Controller
 
         try {
             $user->update([
-                'password' => Hash::make($request->password),
+                'password'             => Hash::make($request->password),
+                'must_change_password' => false, // Reset flag setelah berhasil ganti
             ]);
 
             return back()->with('success', 'Password berhasil diubah! Gunakan password baru ini untuk login berikutnya.');
