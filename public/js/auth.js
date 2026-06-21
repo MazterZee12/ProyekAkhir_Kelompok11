@@ -4,6 +4,8 @@
 
 // ── Login: toggle password + loading state ──────────────────
 (function () {
+    if (!document.getElementById('loginForm')) return; // ← FIX: guard halaman
+
     const toggleBtn     = document.getElementById('togglePassword');
     const passwordInput = document.getElementById('password');
     const eyeIcon       = document.getElementById('eyeIcon');
@@ -37,7 +39,6 @@
 
 // ── Register: toggle password + strength + match ────────────
 (function () {
-    // Hanya jalan jika ada form register
     if (!document.getElementById('registerForm')) return;
 
     function setupToggle(btnId, inputId, iconId) {
@@ -140,7 +141,6 @@
 
 // ── Change Password: toggle + strength + match ──────────────
 (function () {
-    // Hanya jalan jika ada form change password
     if (!document.getElementById('changePasswordForm')) return;
 
     function setupToggle(btnId, inputId, iconId) {
@@ -156,12 +156,10 @@
         });
     }
 
-    // Semua 3 toggle di change password
     setupToggle('toggleCurrent',  'current_password',     'eyeIconCurrent');
     setupToggle('togglePassword', 'password',              'eyeIcon');
     setupToggle('toggleConfirm',  'password_confirmation', 'eyeIconConfirm');
 
-    // Password strength
     const pwInput       = document.getElementById('password');
     const strengthFill  = document.getElementById('pwStrengthFill');
     const strengthLabel = document.getElementById('pwStrengthLabel');
@@ -195,7 +193,6 @@
         });
     }
 
-    // Password match check
     const confirmInput = document.getElementById('password_confirmation');
     const matchError   = document.getElementById('matchError');
     const changeForm   = document.getElementById('changePasswordForm');

@@ -38,7 +38,6 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            // Cek flag dari DB (bukan session, supaya tidak hilang saat regenerate)
             if ($user->must_change_password) {
                 return redirect()->route('password.change')
                     ->with('info', 'Kamu menggunakan password sementara. Silakan ganti sekarang.');
@@ -146,7 +145,6 @@ class AuthController extends Controller
         try {
             $newPassword = Str::random(8);
 
-            // Simpan flag di DB supaya tidak hilang saat session regenerate setelah login
             $user->update([
                 'password'             => Hash::make($newPassword),
                 'must_change_password' => true,
@@ -189,7 +187,7 @@ class AuthController extends Controller
         try {
             $user->update([
                 'password'             => Hash::make($request->password),
-                'must_change_password' => false, // Reset flag setelah berhasil ganti
+                'must_change_password' => false,
             ]);
 
             return back()->with('success', 'Password berhasil diubah! Gunakan password baru ini untuk login berikutnya.');

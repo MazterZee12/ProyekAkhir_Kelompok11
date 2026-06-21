@@ -202,6 +202,9 @@ class ReviewController extends Controller
                 : 'Ulasan berhasil dilaporkan.';
 
             return back()->with('success', $message);
+        } catch (\RuntimeException $e) {
+            // contoh: user sudah pernah melaporkan review ini
+            return back()->with('error', $e->getMessage());
         } catch (\Exception $e) {
             Log::error('Public\\ReviewController::report failed', [
                 'review_id' => $review->id,

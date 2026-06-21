@@ -15,6 +15,7 @@ return new class extends Migration {
             $table->text('comment')->nullable();
             $table->boolean('is_hidden')->default(false);
             $table->unsignedInteger('reports_count')->default(0);
+            $table->json('reported_by')->nullable();
             $table->timestamps();
             $table->unique(['user_id', 'visit_date']);
         });
