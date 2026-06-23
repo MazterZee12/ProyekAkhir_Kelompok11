@@ -243,8 +243,16 @@
 
     <div class="announcements-grid">
         @forelse($announcements->take(3) as $announcement)
-            <a href="{{ route('public.announcements.show', $announcement->id) }}"
-               class="ann-card reveal">
+            <button
+                type="button"
+                class="ann-card reveal js-detail-card"
+                data-detail-type="announcement"
+                data-title="{{ $announcement->title }}"
+                data-badge="{{ ucfirst($announcement->type) }}"
+                data-meta="{{ $announcement->created_at->format('d M Y') }}"
+                data-description="{{ e(strip_tags($announcement->content)) }}"
+                data-image="{{ $announcement->photo?->url ?? '' }}"
+            >
                 <div class="ann-img">
                     @if($announcement->photo)
                         <img src="{{ $announcement->photo->url }}" alt="{{ $announcement->title }}">
@@ -263,7 +271,7 @@
                     <h4>{{ $announcement->title }}</h4>
                     <p>{{ \Illuminate\Support\Str::limit(strip_tags($announcement->content), 100) }}</p>
                 </div>
-            </a>
+            </button>
         @empty
             <p style="color:var(--text-gray);">Belum ada pengumuman.</p>
         @endforelse

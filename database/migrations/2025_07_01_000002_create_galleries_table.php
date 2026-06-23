@@ -8,12 +8,13 @@ return new class extends Migration {
     public function up(): void {
         Schema::create('galleries', function (Blueprint $table) {
             $table->id();
-            $table->string('title', 255);
+            $table->string('title', 255)->nullable();
             $table->text('description')->nullable();
             $table->foreignId('media_id')
                   ->nullable()
                   ->constrained('media')
                   ->nullOnDelete();
+            $table->string('type', 50)->default('photo');
             $table->timestamps();
         });
     }
