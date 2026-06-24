@@ -36,8 +36,8 @@
             <div class="chat-quick-replies" id="quickReplies">
                 <button class="chat-quick-btn" data-msg="Berapa harga tiket masuk?">🎫 Harga Tiket</button>
                 <button class="chat-quick-btn" data-msg="Apa saja fasilitas yang tersedia?">🏖️ Fasilitas</button>
-                <button class="chat-quick-btn" data-msg="Jam buka dan tutup pantai?">🕐 Jam Buka</button>
-                <button class="chat-quick-btn" data-msg="Bagaimana cara menuju ke sana?">📍 Lokasi</button>
+                <button class="chat-quick-btn" data-msg="Apa saja ulasan dari pengunjung?">⭐ Ulasan Orang</button>
+                <button class="chat-quick-btn" data-msg="Tentang Pasir Putih Parparean">📍Tentang</button>
             </div>
         </div>
         {{-- Typing --}}

@@ -168,8 +168,10 @@ class AuthController extends Controller
 
     public function changePassword(Request $request)
     {
+        $user = Auth::user();
+
         $request->validate([
-            'current_password' => ['required'],
+            'current_password' => [$user->must_change_password ? 'nullable' : 'required'],
             'password'         => ['required', 'confirmed', Password::min(8)],
         ], [
             'current_password.required' => 'Password saat ini wajib diisi.',
@@ -178,10 +180,10 @@ class AuthController extends Controller
             'password.min'              => 'Password baru minimal 8 karakter.',
         ]);
 
-        $user = Auth::user();
-
-        if (!Hash::check($request->current_password, $user->password)) {
-            return back()->with('error', 'Password saat ini tidak sesuai.');
+        if (!$user->must_change_password) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                return back()->with('error', 'Password saat ini tidak sesuai.');
+            }
         }
 
         try {
@@ -190,7 +192,11 @@ class AuthController extends Controller
                 'must_change_password' => false,
             ]);
 
-            return back()->with('success', 'Password berhasil diubah! Gunakan password baru ini untuk login berikutnya.');
+            // Refresh user di session supaya must_change_password terupdate
+            Auth::setUser($user->fresh());
+
+            return redirect()->route('home')
+                ->with('success', 'Password berhasil diubah! Selamat datang.');
 
         } catch (\Exception $e) {
             return back()->with('error', 'Gagal mengubah password. Silakan coba lagi.');
@@ -199,7 +205,7 @@ class AuthController extends Controller
 
     // ── Helper ───────────────────────────────────────────────
 
-    protected function redirectAuthenticated($user)
+    protected function redirectAuthenticated($user) 
     {
         if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');

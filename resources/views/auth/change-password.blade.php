@@ -39,7 +39,13 @@
                     <i class="fas fa-shield-halved"></i>
                 </div>
                 <h1>Ganti Password</h1>
-                <p>Masukkan password lama dan buat password baru untuk akunmu.</p>
+                <p>
+                    @if(auth()->user()->must_change_password)
+                        Buat password baru untuk akunmu.
+                    @else
+                        Masukkan password lama dan buat password baru untuk akunmu.
+                    @endif
+                </p>
             </div>
 
             @if(session('info'))
@@ -63,14 +69,15 @@
             <form method="POST" action="{{ route('password.change.post') }}" class="login-form" id="changePasswordForm">
                 @csrf
 
-                {{-- Password Saat Ini --}}
+                {{-- Password Saat Ini — hanya tampil jika bukan dari lupa password --}}
+                @if(!auth()->user()->must_change_password)
                 <div class="form-group {{ $errors->has('current_password') ? 'has-error' : '' }}">
                     <label for="current_password">Password Saat Ini</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock input-icon"></i>
                         <input type="password" name="current_password" id="current_password"
                             placeholder="••••••••"
-                            autocomplete="current-password" required>
+                            autocomplete="off" required>
                         <button type="button" class="toggle-pw" id="toggleCurrent" tabindex="-1">
                             <i class="fas fa-eye" id="eyeIconCurrent"></i>
                         </button>
@@ -81,6 +88,7 @@
                         </span>
                     @enderror
                 </div>
+                @endif
 
                 {{-- Password Baru --}}
                 <div class="form-group {{ $errors->has('password') ? 'has-error' : '' }}">
