@@ -78,6 +78,8 @@
                         @for($i = 1; $i <= 5; $i++)
                             @if($review->rating >= $i)
                                 <i class="fas fa-star star-filled"></i>
+                            @elseif($review->rating >= $i - 0.5)
+                                <i class="fas fa-star-half-alt star-filled"></i>
                             @else
                                 <i class="far fa-star star-empty"></i>
                             @endif

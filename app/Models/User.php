@@ -11,19 +11,24 @@ class User extends Authenticatable
 {
     use HasFactory, Notifiable;
 
-    protected $fillable = ['name', 'email', 'password', 'role'];
+    protected $fillable = ['name', 'email', 'password', 'role', 'must_change_password'];
+
     protected $hidden = ['password', 'remember_token'];
 
     protected function casts(): array
     {
         return [
-            'email_verified_at' => 'datetime',
-            'password'          => 'hashed',
-            'role'              => 'string',
+            'email_verified_at'    => 'datetime',
+            'role'                 => 'string',
+            'must_change_password' => 'boolean',
         ];
     }
 
-    // ─── Relationships ────────────────────────────────────────────────────
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
     public function media(): HasMany
     {
         return $this->hasMany(Media::class, 'uploaded_by');

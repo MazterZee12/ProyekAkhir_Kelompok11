@@ -1,18 +1,15 @@
 {{-- resources/views/public/partials/_chatbot.blade.php --}}
 <div class="chat-widget" id="chatWidget">
-
     {{-- Toggle --}}
     <button class="chat-toggle" id="chatToggle" aria-label="Buka Chat">
         <i class="fas fa-comments chat-icon-open"></i>
         <i class="fas fa-times chat-icon-close"></i>
         <span class="chat-badge" id="chatBadge">1</span>
     </button>
-
     {{-- Popup --}}
     <div class="chat-popup" id="chatPopup">
-
         {{-- Header --}}
-        <div class="chat-header">
+        <div class="chat-header" id="chatHeader">
             <div class="chat-header-avatar">
                 <i class="fas fa-umbrella-beach"></i>
             </div>
@@ -27,7 +24,6 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-
         {{-- Messages --}}
         <div class="chat-messages" id="chatMessages">
             <div class="chat-msg chat-msg-bot">
@@ -40,11 +36,10 @@
             <div class="chat-quick-replies" id="quickReplies">
                 <button class="chat-quick-btn" data-msg="Berapa harga tiket masuk?">🎫 Harga Tiket</button>
                 <button class="chat-quick-btn" data-msg="Apa saja fasilitas yang tersedia?">🏖️ Fasilitas</button>
-                <button class="chat-quick-btn" data-msg="Jam buka dan tutup pantai?">🕐 Jam Buka</button>
-                <button class="chat-quick-btn" data-msg="Bagaimana cara menuju ke sana?">📍 Lokasi</button>
+                <button class="chat-quick-btn" data-msg="Apa saja ulasan dari pengunjung?">⭐ Ulasan Orang</button>
+                <button class="chat-quick-btn" data-msg="Tentang Pasir Putih Parparean">📍Tentang</button>
             </div>
         </div>
-
         {{-- Typing --}}
         <div class="chat-typing" id="chatTyping">
             <div class="chat-msg-avatar"><i class="fas fa-umbrella-beach"></i></div>
@@ -52,7 +47,6 @@
                 <span></span><span></span><span></span>
             </div>
         </div>
-
         {{-- Input --}}
         <div class="chat-input-area">
             <div class="chat-input-wrap">
@@ -65,6 +59,7 @@
             </div>
             <div class="chat-footer-note">Powered by AI · Pasir Putih Parparean</div>
         </div>
-
+        {{-- Resize Handle --}}
+        <div class="chat-resize-handle" id="chatResizeHandle"></div>
     </div>
 </div>

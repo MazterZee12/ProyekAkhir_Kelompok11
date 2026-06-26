@@ -11,6 +11,7 @@ class Gallery extends Model
         'title',
         'description',
         'media_id',
+        'type',
     ];
 
     public function media(): BelongsTo

@@ -1,11 +1,8 @@
 @extends('layouts.auth')
-
-@section('title', 'Daftar Akun — Pasir Putih Parparean')
-
+@section('title', 'Ganti Password — Pasir Putih Parparean')
 @section('content')
-<div class="login-wrapper register-wrapper">
+<div class="login-wrapper">
 
-    {{-- LEFT VISUAL PANEL --}}
     <div class="login-visual">
         <div class="login-visual-bg"></div>
         <div class="login-visual-content">
@@ -13,7 +10,7 @@
                 Pasir Putih <span>Parparean</span>
             </a>
             <div class="login-visual-quote">
-                <p>"Bergabunglah dengan ribuan wisatawan yang telah merasakan keajaiban Danau Toba."</p>
+                <p>"Jaga keamanan akunmu dengan password yang kuat."</p>
                 <div class="quote-line"></div>
             </div>
             <div class="login-visual-stats">
@@ -26,16 +23,10 @@
                     <span class="vs-num">4.8★</span>
                     <span class="vs-label">Rating Rata-rata</span>
                 </div>
-                <div class="vs-divider"></div>
-                <div class="vs-item">
-                    <span class="vs-num">100%</span>
-                    <span class="vs-label">Gratis Daftar</span>
-                </div>
             </div>
         </div>
     </div>
 
-    {{-- RIGHT FORM PANEL --}}
     <div class="login-form-panel">
         <div class="login-form-inner">
 
@@ -44,60 +35,64 @@
             </a>
 
             <div class="login-form-header">
-                <div class="login-badge register-badge">
-                    <i class="fas fa-user-plus"></i>
+                <div class="login-badge">
+                    <i class="fas fa-shield-halved"></i>
                 </div>
-                <h1>Buat Akun</h1>
-                <p>Daftar untuk bisa memberikan ulasan pengalamanmu</p>
+                <h1>Ganti Password</h1>
+                <p>
+                    @if(auth()->user()->must_change_password)
+                        Buat password baru untuk akunmu.
+                    @else
+                        Masukkan password lama dan buat password baru untuk akunmu.
+                    @endif
+                </p>
             </div>
 
-            @if(session('error'))
-                <div class="login-alert login-alert-error">
-                    <i class="fas fa-exclamation-circle"></i>
-                    {{ session('error') }}
+            @if(session('info'))
+                <div class="login-alert login-alert-info">
+                    <i class="fas fa-circle-info"></i> {{ session('info') }}
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('register.post') }}" class="login-form" id="registerForm">
+            @if(session('success'))
+                <div class="login-alert login-alert-success">
+                    <i class="fas fa-check-circle"></i> {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="login-alert login-alert-error">
+                    <i class="fas fa-exclamation-circle"></i> {{ session('error') }}
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('password.change.post') }}" class="login-form" id="changePasswordForm">
                 @csrf
 
-                {{-- Name --}}
-                <div class="form-group {{ $errors->has('name') ? 'has-error' : '' }}">
-                    <label for="name">Nama Lengkap</label>
+                {{-- Password Saat Ini — hanya tampil jika bukan dari lupa password --}}
+                @if(!auth()->user()->must_change_password)
+                <div class="form-group {{ $errors->has('current_password') ? 'has-error' : '' }}">
+                    <label for="current_password">Password Saat Ini</label>
                     <div class="input-wrapper">
-                        <i class="fas fa-user input-icon"></i>
-                        <input type="text" name="name" id="name"
-                            value="{{ old('name') }}"
-                            placeholder="Nama lengkapmu"
-                            autocomplete="name" autofocus required>
+                        <i class="fas fa-lock input-icon"></i>
+                        <input type="password" name="current_password" id="current_password"
+                            placeholder="••••••••"
+                            autocomplete="off" required>
+                        <button type="button" class="toggle-pw" id="toggleCurrent" tabindex="-1">
+                            <i class="fas fa-eye" id="eyeIconCurrent"></i>
+                        </button>
                     </div>
-                    @error('name')
+                    @error('current_password')
                         <span class="field-error">
                             <i class="fas fa-circle-exclamation"></i> {{ $message }}
                         </span>
                     @enderror
                 </div>
+                @endif
 
-                {{-- Email --}}
-                <div class="form-group {{ $errors->has('email') ? 'has-error' : '' }}">
-                    <label for="email">Email</label>
-                    <div class="input-wrapper">
-                        <i class="fas fa-envelope input-icon"></i>
-                        <input type="email" name="email" id="email"
-                            value="{{ old('email') }}"
-                            placeholder="email@contoh.com"
-                            autocomplete="email" required>
-                    </div>
-                    @error('email')
-                        <span class="field-error">
-                            <i class="fas fa-circle-exclamation"></i> {{ $message }}
-                        </span>
-                    @enderror
-                </div>
-
-                {{-- Password --}}
+                {{-- Password Baru --}}
                 <div class="form-group {{ $errors->has('password') ? 'has-error' : '' }}">
-                    <label for="password">Password</label>
+                    <label for="password">Password Baru</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock input-icon"></i>
                         <input type="password" name="password" id="password"
@@ -107,7 +102,6 @@
                             <i class="fas fa-eye" id="eyeIcon"></i>
                         </button>
                     </div>
-                    {{-- Strength bar --}}
                     <div class="pw-strength-wrap" id="pwStrengthWrap">
                         <div class="pw-strength-bar">
                             <div class="pw-strength-fill" id="pwStrengthFill"></div>
@@ -121,13 +115,13 @@
                     @enderror
                 </div>
 
-                {{-- Confirm Password --}}
-                <div class="form-group {{ $errors->has('password_confirmation') ? 'has-error' : '' }}">
-                    <label for="password_confirmation">Konfirmasi Password</label>
+                {{-- Konfirmasi Password Baru --}}
+                <div class="form-group">
+                    <label for="password_confirmation">Konfirmasi Password Baru</label>
                     <div class="input-wrapper">
                         <i class="fas fa-lock input-icon"></i>
                         <input type="password" name="password_confirmation" id="password_confirmation"
-                            placeholder="Ulangi password"
+                            placeholder="Ulangi password baru"
                             autocomplete="new-password" required>
                         <button type="button" class="toggle-pw" id="toggleConfirm" tabindex="-1">
                             <i class="fas fa-eye" id="eyeIconConfirm"></i>
@@ -136,26 +130,16 @@
                     <span class="field-error" id="matchError" style="display:none">
                         <i class="fas fa-circle-exclamation"></i> Password tidak cocok
                     </span>
-                    @error('password_confirmation')
-                        <span class="field-error">
-                            <i class="fas fa-circle-exclamation"></i> {{ $message }}
-                        </span>
-                    @enderror
                 </div>
 
-                <button type="submit" class="btn-login" id="registerBtn">
-                    <span class="btn-text">Buat Akun Sekarang</span>
+                <button type="submit" class="btn-login" id="changeBtn">
+                    <span class="btn-text">Simpan Password Baru</span>
                     <i class="fas fa-arrow-right btn-icon"></i>
                 </button>
             </form>
 
-            <div class="login-footer">
-                <p>Sudah punya akun? <a href="{{ route('login') }}">Masuk di sini</a></p>
-            </div>
-
         </div>
     </div>
-
 </div>
 {{-- Tidak ada @push('scripts') — semua sudah di auth.js --}}
 @endsection

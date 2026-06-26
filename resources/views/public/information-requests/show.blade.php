@@ -3,7 +3,7 @@
 @section('content')
 
 <section class="page-hero">
-    <div class="page-hero-bg" style="background-image:url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&q=80')"></div>
+    <div class="page-hero-bg" style="background-image:url('https://zjglidcehtsqqqhbdxyp.supabase.co/storage/v1/object/public/atourin/images/destination/toba/pantai-pasir-putih-parparean-profile1670997298.jpeg')"></div>
     <div class="page-hero-overlay"></div>
     <div class="page-hero-content reveal">
         <div class="section-label" style="justify-content:center;color:var(--accent-light)">Layanan Pengunjung</div>

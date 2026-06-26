@@ -1,21 +1,22 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 
 class AuthController extends Controller
 {
+    // ── Login ────────────────────────────────────────────────
+
     public function showLoginForm()
     {
         if (Auth::check()) {
             return $this->redirectAuthenticated(Auth::user());
         }
-
         return view('auth.login');
     }
 
@@ -35,7 +36,14 @@ class AuthController extends Controller
         if (Auth::attempt($credentials, $remember)) {
             $request->session()->regenerate();
 
-            return $this->redirectAuthenticated(Auth::user());
+            $user = Auth::user();
+
+            if ($user->must_change_password) {
+                return redirect()->route('password.change')
+                    ->with('info', 'Kamu menggunakan password sementara. Silakan ganti sekarang.');
+            }
+
+            return $this->redirectAuthenticated($user);
         }
 
         return back()
@@ -43,12 +51,13 @@ class AuthController extends Controller
             ->with('error', 'Email atau password salah.');
     }
 
+    // ── Register ─────────────────────────────────────────────
+
     public function showRegisterForm()
     {
         if (Auth::check()) {
             return $this->redirectAuthenticated(Auth::user());
         }
-
         return view('auth.register');
     }
 
@@ -59,50 +68,148 @@ class AuthController extends Controller
             'email'    => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
             'password' => ['required', 'confirmed', Password::min(8)],
         ], [
-            'name.required'              => 'Nama lengkap wajib diisi.',
-            'name.string'                => 'Nama lengkap tidak valid.',
-            'name.max'                   => 'Nama lengkap maksimal 255 karakter.',
-            'email.required'             => 'Email wajib diisi.',
-            'email.string'               => 'Email tidak valid.',
-            'email.email'                => 'Format email tidak valid.',
-            'email.max'                  => 'Email maksimal 255 karakter.',
-            'email.unique'               => 'Email ini sudah terdaftar.',
-            'password.required'          => 'Password wajib diisi.',
-            'password.confirmed'         => 'Konfirmasi password tidak cocok.',
-            'password.min'               => 'Password minimal 8 karakter.',
+            'name.required'      => 'Nama lengkap wajib diisi.',
+            'name.string'        => 'Nama lengkap tidak valid.',
+            'name.max'           => 'Nama lengkap maksimal 255 karakter.',
+            'email.required'     => 'Email wajib diisi.',
+            'email.string'       => 'Email tidak valid.',
+            'email.email'        => 'Format email tidak valid.',
+            'email.max'          => 'Email maksimal 255 karakter.',
+            'email.unique'       => 'Email ini sudah terdaftar.',
+            'password.required'  => 'Password wajib diisi.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'password.min'       => 'Password minimal 8 karakter.',
         ]);
 
-        $user = User::create([
-            'name'     => $validated['name'],
-            'email'    => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role'     => 'user',
-        ]);
+        try {
+            $user = User::create([
+                'name'                 => $validated['name'],
+                'email'                => $validated['email'],
+                'password'             => Hash::make($validated['password']),
+                'role'                 => 'user',
+                'must_change_password' => false,
+            ]);
 
-        Auth::login($user);
-        $request->session()->regenerate();
+            Auth::login($user);
+            $request->session()->regenerate();
 
-        return redirect()
-            ->intended(route('home'))
-            ->with('success', 'Akun berhasil dibuat! Selamat datang, ' . $user->name . '.');
+            return redirect()
+                ->intended(route('home'))
+                ->with('success', 'Akun berhasil dibuat! Selamat datang, ' . $user->name . '.');
+
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Gagal membuat akun. Silakan coba lagi.');
+        }
     }
+
+    // ── Logout ───────────────────────────────────────────────
 
     public function logout(Request $request)
     {
         Auth::logout();
-
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-
         return redirect()->route('home');
     }
 
-    protected function redirectAuthenticated($user)
+    // ── Lupa Password ────────────────────────────────────────
+
+    public function showForgotForm()
+    {
+        return view('auth.forgot-password');
+    }
+
+    public function resetPasswordSimple(Request $request)
+    {
+        $request->validate([
+            'name'  => ['required', 'string'],
+            'email' => ['required', 'email'],
+        ], [
+            'name.required'  => 'Nama lengkap wajib diisi.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email'    => 'Format email tidak valid.',
+        ]);
+
+        $user = User::where('email', $request->email)
+                    ->where('role', 'user')
+                    ->first();
+
+        if (!$user || strtolower(trim($user->name)) !== strtolower(trim($request->name))) {
+            return back()
+                ->withInput()
+                ->with('error', 'Nama lengkap atau email tidak sesuai dengan data akun.');
+        }
+
+        try {
+            $newPassword = Str::random(8);
+
+            $user->update([
+                'password'             => Hash::make($newPassword),
+                'must_change_password' => true,
+            ]);
+
+            return back()->with('new_password', $newPassword);
+
+        } catch (\Exception $e) {
+            return back()
+                ->withInput()
+                ->with('error', 'Gagal mereset password. Silakan coba lagi.');
+        }
+    }
+
+    // ── Ganti Password ───────────────────────────────────────
+
+    public function showChangePasswordForm()
+    {
+        return view('auth.change-password');
+    }
+
+    public function changePassword(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'current_password' => [$user->must_change_password ? 'nullable' : 'required'],
+            'password'         => ['required', 'confirmed', Password::min(8)],
+        ], [
+            'current_password.required' => 'Password saat ini wajib diisi.',
+            'password.required'         => 'Password baru wajib diisi.',
+            'password.confirmed'        => 'Konfirmasi password tidak cocok.',
+            'password.min'              => 'Password baru minimal 8 karakter.',
+        ]);
+
+        if (!$user->must_change_password) {
+            if (!Hash::check($request->current_password, $user->password)) {
+                return back()->with('error', 'Password saat ini tidak sesuai.');
+            }
+        }
+
+        try {
+            $user->update([
+                'password'             => Hash::make($request->password),
+                'must_change_password' => false,
+            ]);
+
+            // Refresh user di session supaya must_change_password terupdate
+            Auth::setUser($user->fresh());
+
+            return redirect()->route('home')
+                ->with('success', 'Password berhasil diubah! Selamat datang.');
+
+        } catch (\Exception $e) {
+            return back()->with('error', 'Gagal mengubah password. Silakan coba lagi.');
+        }
+    }
+
+    // ── Helper ───────────────────────────────────────────────
+
+    protected function redirectAuthenticated($user) 
     {
         if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');
         }
-
         return redirect()->intended(route('home'));
     }
 }

@@ -25,17 +25,21 @@
                     <tr>
                         <td>{{ $galleries->firstItem() + $loop->index }}</td>
                         <td>
-                            @if($gallery->type == 'photo')
-                                <img src="{{ $gallery->media->url }}" width="80" class="img-thumbnail">
+                            @if($gallery->media)
+                                @if($gallery->type == 'video')
+                                    <video width="80" controls>
+                                        <source src="{{ $gallery->media->url }}">
+                                    </video>
+                                @else
+                                    <img src="{{ $gallery->media->url }}" width="80" class="img-thumbnail">
+                                @endif
                             @else
-                                <video width="80">
-                                    <source src="{{ $gallery->media->url }}">
-                                </video>
+                                <span class="text-muted small">No preview</span>
                             @endif
                         </td>
                         <td><strong>{{ $gallery->title ?? '-' }}</strong></td>
                         <td>
-                            <span class="badge bg-info text-dark">{{ ucfirst($gallery->type) }}</span>
+                            <span class="badge bg-info text-dark">{{ ucfirst($gallery->type ?? 'photo') }}</span>
                         </td>
                         <td>{{ $gallery->created_at->format('d M Y') }}</td>
                         <td style="white-space:nowrap;">
